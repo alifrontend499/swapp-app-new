@@ -26,27 +26,42 @@ class ContentMainScreen extends StatefulWidget {
 }
 
 class _ContentMainScreenState extends State<ContentMainScreen> {
-
-
-
   // styles
   final labelStyle = GoogleFonts.montserrat(
     fontWeight: FontWeight.w600,
     fontSize: 12
+  );
+  final userNameStyles = GoogleFonts.montserrat(
+      fontSize: 16,
+      fontWeight: FontWeight.w600
+  );
+  final userDesgStyles = GoogleFonts.montserrat(
+    fontSize: 15,
+  );
+  final drawerMenuItemStyle = GoogleFonts.montserrat(
+    fontSize: 14.5,
+  );
+  final onlineStatusItemStyle = GoogleFonts.montserrat(
+      fontSize: 12,
+      fontWeight: FontWeight.w600
   );
 
   int currentIndex = 0;
 
   final screens= [
     const MapContent(),
-    const MessagesContent(),
-    const FavouritesContent(),
     const SwappSpotsContent(),
+    const FavouritesContent(),
+    const MessagesContent(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: Drawer(
+        child: drawerContent(),
+      ),
+
       body: IndexedStack(
         index: currentIndex,
         children: screens,
@@ -72,12 +87,12 @@ class _ContentMainScreenState extends State<ContentMainScreen> {
           ),
 
           BottomNavigationBarItem(
-            label: BNB_MESSAGES,
+            label: BNB_SWAPP_SPOTS,
             icon: Padding(
               padding: EdgeInsets.only(bottom: 5, top: 3),
               child: Icon(
-                UniconsLine.comment_alt,
-                size: 22,
+                UniconsLine.map_marker,
+                size: 25,
               ),
             ),
           ),
@@ -94,12 +109,12 @@ class _ContentMainScreenState extends State<ContentMainScreen> {
           ),
 
           BottomNavigationBarItem(
-            label: BNB_SWAPP_SPOTS,
+            label: BNB_MESSAGES,
             icon: Padding(
               padding: EdgeInsets.only(bottom: 5, top: 3),
               child: Icon(
-                UniconsLine.map_marker,
-                size: 25,
+                UniconsLine.comment_alt,
+                size: 22,
               ),
             ),
           ),
@@ -107,5 +122,169 @@ class _ContentMainScreenState extends State<ContentMainScreen> {
       ),
     );
 
+  }
+
+  // drawer content
+  Widget drawerContent() {
+    return Container(
+      padding: const EdgeInsets.only(left: 0, right: 0, bottom: 20, top: 0),
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // child | user info
+            Container(
+              padding: const EdgeInsets.only(top: 50),
+              color: appPrimaryColor,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 10),
+                  // child | user Image
+                  ClipRRect(
+                    child: Image.network(
+                      'https://i.pinimg.com/736x/89/90/48/899048ab0cc455154006fdb9676964b3.jpg',
+                      height: 80,
+                      width: 80,
+                      fit: BoxFit.cover,
+                    ),
+                    borderRadius: BorderRadius.circular(65.0),
+                  ),
+                  const SizedBox(height: 13),
+
+                  // child | user name
+                  Text(
+                      'Chris MitchellChris',
+                      style: userNameStyles,
+                      textAlign: TextAlign.center
+                  ),
+                  const SizedBox(height: 3),
+
+                  // child | user desg
+                  Text(
+                      'Engineer',
+                      style: userDesgStyles,
+                      textAlign: TextAlign.center
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 15),
+
+            // const Divider(color: Colors.black54),
+            Column(
+              children: [
+                Stack(
+                  children: [
+                    ListTile(
+                      leading: const Icon(
+                        UniconsLine.check_circle,
+                        color: Colors.black54,
+                        size: 25,
+                      ),
+                      minLeadingWidth: 17,
+                      title: Text(
+                        'Your Status',
+                        style: drawerMenuItemStyle,
+                      ),
+                    ),
+                    Positioned(
+                      top: 19,
+                      right: 20,
+                      child: Text(
+                        'ONLINE',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          background: Paint()
+                            ..strokeWidth = 18
+                            ..color = Colors.green
+                            ..style = PaintingStyle.stroke
+                            ..strokeJoin = StrokeJoin.round
+                        ),
+                      )
+                    ),
+                  ],
+                ),
+
+                ListTile(
+                  leading: const Icon(
+                    UniconsLine.user,
+                    color: Colors.black54,
+                    size: 25,
+                  ),
+                  minLeadingWidth: 17,
+                  title: Text(
+                    'Profile',
+                    style: drawerMenuItemStyle,
+                  ),
+                  onTap: () {},
+                ),
+
+                ListTile(
+                  leading: const Icon(
+                    UniconsLine.map,
+                    color: Colors.black54,
+                    size: 25,
+                  ),
+                  minLeadingWidth: 17,
+                  title: Text(
+                    'Find Spot',
+                    style: drawerMenuItemStyle,
+                  ),
+                  onTap: () {},
+                ),
+
+                ListTile(
+                  leading: const Icon(
+                    UniconsLine.setting,
+                    color: Colors.black54,
+                    size: 25,
+                  ),
+                  minLeadingWidth: 17,
+                  title: Text(
+                    'Settings',
+                    style: drawerMenuItemStyle,
+                  ),
+                  onTap: () {},
+                ),
+
+                ListTile(
+                  leading: const Icon(
+                    UniconsLine.info_circle,
+                    color: Colors.black54,
+                    size: 25,
+                  ),
+                  minLeadingWidth: 17,
+                  title: Text(
+                    'Help',
+                    style: drawerMenuItemStyle,
+                  ),
+                  onTap: () {},
+                ),
+
+                ListTile(
+                  leading: const Icon(
+                    UniconsLine.sign_out_alt,
+                    color: Colors.black54,
+                    size: 25,
+                  ),
+                  minLeadingWidth: 17,
+                  title: Text(
+                    'Logout',
+                    style: drawerMenuItemStyle,
+                  ),
+                  onTap: () {},
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

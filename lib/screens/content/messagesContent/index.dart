@@ -143,8 +143,9 @@ class _MessagesContentState extends State<MessagesContent> {
         centerTitle: true,
         leading: null,
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        backgroundColor: Colors.white,
+        elevation: 2,
+        shadowColor: Colors.black26,
       ),
 
       body: RefreshIndicator(

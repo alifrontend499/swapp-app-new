@@ -76,8 +76,9 @@ class _MessagesViewScreenState extends State<MessagesViewScreen> {
           fontWeight: FontWeight.w600,
           color: Colors.black
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        backgroundColor: Colors.white,
+        elevation: 2,
+        shadowColor: Colors.black26,
         leading: IconButton(
           icon: const Icon(
             UniconsLine.angle_left,

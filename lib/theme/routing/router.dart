@@ -16,6 +16,9 @@ import 'package:app/screens/vendorView/index.dart';
 // messages
 import 'package:app/screens/content/messagesContent/messagesView/index.dart';
 
+// profile
+import 'package:app/screens/userProfile/index.dart';
+
 
 Route<dynamic> generateRoutes(RouteSettings settings) {
   switch(settings.name) {
@@ -39,6 +42,9 @@ Route<dynamic> generateRoutes(RouteSettings settings) {
 
     case messagesViewScreenRoute:
       return MaterialPageRoute(builder: (context) => const MessagesViewScreen());
+
+    case userProfileScreenRoute:
+      return MaterialPageRoute(builder: (context) => const UserProfileScreen());
 
     default:
       return MaterialPageRoute(builder: (context) => const InitialScreen());

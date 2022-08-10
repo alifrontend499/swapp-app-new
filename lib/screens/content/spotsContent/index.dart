@@ -150,8 +150,9 @@ class _SwappSpotsContentState extends State<SwappSpotsContent> {
         centerTitle: true,
         leading: null,
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        backgroundColor: Colors.white,
+        elevation: 2,
+        shadowColor: Colors.black26,
       ),
       body: RefreshIndicator(
         onRefresh: () => onRefresh(),

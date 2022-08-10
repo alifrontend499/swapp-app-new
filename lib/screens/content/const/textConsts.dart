@@ -2,7 +2,7 @@
 const String BNB_MAP = 'Map';
 const String BNB_MESSAGES = 'Messages';
 const String BNB_FAVOURITES = 'Favourites';
-const String BNB_SWAPP_SPOTS = 'SWAPP Spots';
+const String BNB_SWAPP_SPOTS = 'Swapp Spots';
 
 // screen: MESSAGES
 const String MSGS_PAGE_TITLE = 'Messages';

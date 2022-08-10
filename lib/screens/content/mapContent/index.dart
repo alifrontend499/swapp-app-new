@@ -14,6 +14,10 @@ import 'package:unicons/unicons.dart';
 // colors
 import 'package:app/theme/colors.dart';
 
+// search
+import 'package:app/screens/content/mapContent/search/index.dart';
+
+
 class MapContent extends StatefulWidget {
   const MapContent({Key? key}) : super(key: key);
 
@@ -22,16 +26,6 @@ class MapContent extends StatefulWidget {
 }
 
 class _MapContentState extends State<MapContent> {
-  // styles
-  final userNameStyles = GoogleFonts.montserrat(
-    fontSize: 16,
-    fontWeight: FontWeight.w600
-  );
-  final userDesgStyles = GoogleFonts.montserrat(
-    fontSize: 15,
-  );
-
-
   Completer<GoogleMapController> _controller = Completer();
 
   static final CameraPosition _kGooglePlex = CameraPosition(
@@ -49,31 +43,43 @@ class _MapContentState extends State<MapContent> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
+      // extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(
-          size: 45,
-          color: Colors.white
+        title: const Text('Find Spots'),
+        titleTextStyle: GoogleFonts.montserrat(
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+            color: Colors.black
         ),
-        actionsIconTheme: const IconThemeData(
-          size: 45,
-          color: Colors.white
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 2,
+        shadowColor: Colors.black26,
+        leading: IconButton(
+          icon: const Icon(
+            UniconsLine.subject,
+            size: 31,
+          ),
+          color: Colors.black,
+          splashColor: Colors.transparent,
+          onPressed: () => Scaffold.of(context).openDrawer(),
         ),
         actions: [
           IconButton(
-            onPressed: () {},
             icon: const Icon(
-              UniconsLine.user_location,
-              size: 35,
+              UniconsLine.search_alt,
+              size: 27,
+              color: Colors.black,
             ),
-          ),
+            splashColor: Colors.transparent,
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: MapSearch()
+              );
+            },
+          ), // user icon
         ],
-      ),
-
-      drawer: Drawer(
-        child: drawerContent(),
       ),
 
       body: Stack(
@@ -104,93 +110,6 @@ class _MapContentState extends State<MapContent> {
           //   ),
           // ),
         ],
-      ),
-    );
-  }
-
-  // drawer content
-  Widget drawerContent() {
-    return Container(
-      padding: const EdgeInsets.only(left: 0, right: 0, bottom: 20, top: 40),
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          children: [
-            // child | user info
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(height: 20),
-                // child | user Image
-                ClipRRect(
-                  child: Image.network(
-                    'https://i.pinimg.com/736x/89/90/48/899048ab0cc455154006fdb9676964b3.jpg',
-                    height: 80,
-                    width: 80,
-                    fit: BoxFit.cover,
-                  ),
-                  borderRadius: BorderRadius.circular(65.0),
-                ),
-                const SizedBox(height: 10),
-
-                // child | user name
-                Text(
-                  'Chris MitchellChris',
-                  style: userNameStyles,
-                  textAlign: TextAlign.center
-                ),
-                const SizedBox(height: 3),
-
-                // child | user desg
-                Text(
-                  'Engineer',
-                  style: userDesgStyles,
-                  textAlign: TextAlign.center
-                ),
-                const SizedBox(height: 20),
-              ],
-            ),
-
-            const Divider(color: Colors.black54),
-
-            // const Divider(color: Colors.black54),
-            Column(
-              children: [
-                ListTile(
-                  leading: const Icon(
-                    UniconsLine.home_alt,
-                  ),
-                  title: const Text('Home'),
-                  onTap: () {},
-                ),
-
-                ListTile(
-                  leading: const Icon(
-                    UniconsLine.user,
-                  ),
-                  title: const Text('Profile'),
-                  onTap: () {},
-                ),
-
-                ListTile(
-                  leading: const Icon(
-                    UniconsLine.info_circle,
-                  ),
-                  title: const Text('Help'),
-                  onTap: () {},
-                ),
-
-                ListTile(
-                  leading: const Icon(
-                    UniconsLine.sign_out_alt,
-                  ),
-                  title: const Text('Logout'),
-                  onTap: () {},
-                ),
-              ],
-            ),
-          ],
-        ),
       ),
     );
   }
