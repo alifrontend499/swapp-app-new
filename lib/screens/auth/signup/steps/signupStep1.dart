@@ -63,6 +63,18 @@ class _SignUpStep1ScreenState extends State<SignUpStep1Screen> {
         )
     ),
   );
+  final userImageBtnStyle = ElevatedButton.styleFrom(
+    elevation: 0,
+    primary: appGreyDarkBGColor,
+    onPrimary: Colors.black87,
+    minimumSize: const Size(105, 105),
+    splashFactory: NoSplash.splashFactory,
+    shadowColor: Colors.transparent,
+    padding: EdgeInsets.zero,
+    shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(50)
+    ),
+  );
 
   // IMAGE PICKER
   File? image;
@@ -165,18 +177,7 @@ class _SignUpStep1ScreenState extends State<SignUpStep1Screen> {
                                 UniconsLine.camera,
                                 size: 35,
                               ),
-                              style: ElevatedButton.styleFrom(
-                                elevation: 0,
-                                primary: appGreyDarkBGColor,
-                                onPrimary: Colors.black87,
-                                minimumSize: const Size(105, 105),
-                                splashFactory: NoSplash.splashFactory,
-                                shadowColor: Colors.transparent,
-                                padding: EdgeInsets.zero,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(50)
-                                ),
-                              ),
+                              style: userImageBtnStyle,
                             ),
                             const SizedBox(height: 10),
                             Text(

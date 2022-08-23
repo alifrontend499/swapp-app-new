@@ -18,6 +18,12 @@ import 'package:app/screens/content/spotsContent/index.dart';
 // icons
 import 'package:unicons/unicons.dart';
 
+// routes
+import 'package:app/theme/routing/routing_constants.dart';
+
+// toast
+import 'package:fluttertoast/fluttertoast.dart';
+
 class ContentMainScreen extends StatefulWidget {
   const ContentMainScreen({Key? key}) : super(key: key);
 
@@ -54,6 +60,24 @@ class _ContentMainScreenState extends State<ContentMainScreen> {
     const FavouritesContent(),
     const MessagesContent(),
   ];
+
+  void showToast(msg) => Fluttertoast.showToast(
+      msg: msg,
+      fontSize: 15
+  );
+
+  String userStatus = STATUS_OFFLINE;
+  void onUserStatusChanged() => {
+    if(userStatus == STATUS_OFFLINE) {
+      setState(() { userStatus = STATUS_ONLINE;}),
+      Fluttertoast.cancel(),
+      showToast(STATUS_CHANGED)
+    } else {
+      setState(() { userStatus = STATUS_OFFLINE;}),
+      Fluttertoast.cancel(),
+      showToast(STATUS_CHANGED)
+    }
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -174,7 +198,6 @@ class _ContentMainScreenState extends State<ContentMainScreen> {
 
             const SizedBox(height: 15),
 
-            // const Divider(color: Colors.black54),
             Column(
               children: [
                 Stack(
@@ -187,24 +210,29 @@ class _ContentMainScreenState extends State<ContentMainScreen> {
                       ),
                       minLeadingWidth: 17,
                       title: Text(
-                        'Your Status',
+                        LEFT_MENU_ITEM_STATUS,
                         style: drawerMenuItemStyle,
                       ),
                     ),
                     Positioned(
                       top: 19,
                       right: 20,
-                      child: Text(
-                        'ONLINE',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                          background: Paint()
-                            ..strokeWidth = 18
-                            ..color = Colors.green
-                            ..style = PaintingStyle.stroke
-                            ..strokeJoin = StrokeJoin.round
+                      child: InkWell(
+                        splashColor: Colors.transparent,
+                        highlightColor: appGreyHighlightBGColor,
+                        onTap: () => onUserStatusChanged(),
+                        child: Text(
+                          userStatus,
+                          style: GoogleFonts.montserrat(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                            background: Paint()
+                              ..strokeWidth = 18
+                              ..color = (userStatus == STATUS_ONLINE) ? Colors.green : Colors.grey
+                              ..style = PaintingStyle.stroke
+                              ..strokeJoin = StrokeJoin.round
+                          ),
                         ),
                       )
                     ),
@@ -219,10 +247,10 @@ class _ContentMainScreenState extends State<ContentMainScreen> {
                   ),
                   minLeadingWidth: 17,
                   title: Text(
-                    'Profile',
+                    LEFT_MENU_ITEM_PROFILE,
                     style: drawerMenuItemStyle,
                   ),
-                  onTap: () {},
+                  onTap: () => Navigator.popAndPushNamed(context, userProfileScreenRoute),
                 ),
 
                 ListTile(
@@ -233,7 +261,7 @@ class _ContentMainScreenState extends State<ContentMainScreen> {
                   ),
                   minLeadingWidth: 17,
                   title: Text(
-                    'Find Spot',
+                    LEFT_MENU_ITEM_SPOT,
                     style: drawerMenuItemStyle,
                   ),
                   onTap: () {},
@@ -247,7 +275,7 @@ class _ContentMainScreenState extends State<ContentMainScreen> {
                   ),
                   minLeadingWidth: 17,
                   title: Text(
-                    'Settings',
+                    LEFT_MENU_ITEM_SETTINGS,
                     style: drawerMenuItemStyle,
                   ),
                   onTap: () {},
@@ -261,7 +289,7 @@ class _ContentMainScreenState extends State<ContentMainScreen> {
                   ),
                   minLeadingWidth: 17,
                   title: Text(
-                    'Help',
+                    LEFT_MENU_ITEM_HELP,
                     style: drawerMenuItemStyle,
                   ),
                   onTap: () {},
@@ -275,7 +303,7 @@ class _ContentMainScreenState extends State<ContentMainScreen> {
                   ),
                   minLeadingWidth: 17,
                   title: Text(
-                    'Logout',
+                    LEFT_MENU_ITEM_LOGOUT,
                     style: drawerMenuItemStyle,
                   ),
                   onTap: () {},

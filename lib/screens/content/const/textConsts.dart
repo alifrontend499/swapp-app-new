@@ -2,7 +2,17 @@
 const String BNB_MAP = 'Map';
 const String BNB_MESSAGES = 'Messages';
 const String BNB_FAVOURITES = 'Favourites';
-const String BNB_SWAPP_SPOTS = 'Swapp Spots';
+const String BNB_SWAPP_SPOTS = 'SWAPP Spots';
+
+const String LEFT_MENU_ITEM_STATUS = 'Your Status';
+const String STATUS_ONLINE = 'Online';
+const String STATUS_OFFLINE = 'Offline';
+const String LEFT_MENU_ITEM_PROFILE = 'Profile';
+const String LEFT_MENU_ITEM_SPOT = 'Find Spot';
+const String LEFT_MENU_ITEM_SETTINGS = 'Settings';
+const String LEFT_MENU_ITEM_HELP = 'Help';
+const String LEFT_MENU_ITEM_LOGOUT = 'Logout';
+const String STATUS_CHANGED = 'Status Changed';
 
 // screen: MESSAGES
 const String MSGS_PAGE_TITLE = 'Messages';

@@ -15,3 +15,9 @@ const String ENTER_PASSWORD = 'Enter your password';
 const String FORGOT_PASSWORD_HEADING = 'Retrieve Password';
 const String FORGOT_PASSWORD_SUBMIT_BTN = 'Reset Password';
 const String ACCOUNT_ALREADY_EXIST = 'Already have an account';
+
+const String ERROR_MSG_ENTER_EMAIL = 'Please enter a valid email address';
+const String ERROR_MSG_ENTER_VALUE = 'Please enter a valid value';
+
+const String SNACKBAR_MSG_INVALID_CREDS = 'Invalid email or password';
+const String SNACKBAR_MSG_VALID_CREDS = 'Login Successful';
