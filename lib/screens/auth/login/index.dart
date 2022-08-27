@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+// app consts
+import 'package:app/theme/commonConst/textConsts.dart';
+
 // routing consts
 import 'package:app/theme/routing/routing_constants.dart';
 
@@ -11,6 +14,7 @@ import 'package:app/theme/colors.dart';
 
 // page text
 import 'package:app/screens/auth/login/const/textConsts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // icons
 import 'package:unicons/unicons.dart';
@@ -116,29 +120,39 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // showing loading
       setState(() => loadingLogin = true);
+      final sharedPrefs = await SharedPreferences.getInstance();
 
       try {
+        // unfocus the inputs
+        FocusManager.instance.primaryFocus?.unfocus();
+
         // network request
         final response = await http.post(Uri.parse(userLoginApi),
-            body: {'email': userEmail, 'password': userPassword}
+          body: {'email': userEmail, 'password': userPassword}
         );
 
         print('Response status: ${response.statusCode}');
 
         // showing snackbar
         ScaffoldMessenger.of(context).showSnackBar(successSnackBar);
+
+        // removing value from shared preferences
+        sharedPrefs.remove(SHARED_PREF_KEY_IS_USER_LOGGED_IN);
+        // setting value in shared preferences
+        sharedPrefs.setBool(SHARED_PREF_KEY_IS_USER_LOGGED_IN, true);
+
+        // navigate to main screen and remove all the history
+        await Future.delayed(const Duration(seconds: 2));
+        Navigator.pushNamedAndRemoveUntil(context, contentMainScreenRoute, (r) => false);
       } catch (err) {
         print('Error Occurred: ${err}');
+
+        // hiding loading
+        setState(() => loadingLogin = false);
 
         // showing snackbar
         ScaffoldMessenger.of(context).showSnackBar(errorSnackBar);
       }
-
-      // hiding loading
-      setState(() => loadingLogin = false);
-
-      // navigate to login
-      // Navigator.pushNamed(context, contentMainScreenRoute);
     }
   }
 
