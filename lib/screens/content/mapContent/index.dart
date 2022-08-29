@@ -26,18 +26,34 @@ class MapContent extends StatefulWidget {
 }
 
 class _MapContentState extends State<MapContent> {
-  Completer<GoogleMapController> _controller = Completer();
+  String defaultMapStyle = '';
+  late BitmapDescriptor mapIcon;
+  Set<Marker> mapMarkers = {};
 
-  static final CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.42796133580664, -122.085749655962),
-    zoom: 14.4746,
-  );
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
 
-  static final CameraPosition _kLake = CameraPosition(
+    // loading map styles
+    DefaultAssetBundle.of(context).loadString('assets/mapStyles/default_style.json').then((value) => defaultMapStyle = value);
+
+    // loading map Icon
+    BitmapDescriptor.fromAssetImage(
+      const ImageConfiguration(
+        size: Size(50, 50)
+      ),
+      'assets/icons/map-icon.png'
+    ).then((value) => mapIcon = value);
+  }
+
+  final Completer<GoogleMapController> _controller = Completer();
+
+  static const CameraPosition _posIndia = CameraPosition(
     bearing: 192.8334901395799,
-    target: LatLng(37.43296265331129, -122.08832357078792),
-    tilt: 59.440717697143555,
-    zoom: 19.151926040649414
+    target: LatLng(31.3260, 75.5762),
+    // tilt: 50,
+    zoom: 13,
   );
 
   @override
@@ -47,9 +63,9 @@ class _MapContentState extends State<MapContent> {
       appBar: AppBar(
         title: const Text('Find Spots'),
         titleTextStyle: GoogleFonts.montserrat(
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
-            color: Colors.black
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+          color: Colors.black
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -88,10 +104,71 @@ class _MapContentState extends State<MapContent> {
           // child | map view
           Expanded(
             child: GoogleMap(
-              mapType: MapType.hybrid,
-              initialCameraPosition: _kGooglePlex,
+              initialCameraPosition: _posIndia,
+              markers: mapMarkers,
+              mapToolbarEnabled: false,
               onMapCreated: (GoogleMapController controller) {
                 _controller.complete(controller);
+                controller.setMapStyle(defaultMapStyle);
+
+                setState(() {
+                  mapMarkers = {
+                    Marker(
+                        markerId: const MarkerId('devi_talab'),
+                        position: const LatLng(31.338613462594523, 75.56284504008605),
+                        infoWindow: const InfoWindow(
+                          title: 'Devi Talab Mandir',
+                          snippet: 'Lorem Ipsum'
+                        ),
+                        icon: mapIcon
+                    ),
+                    Marker(
+                        markerId: const MarkerId('wonderland'),
+                        position: const LatLng(31.26307300041686, 75.53283375542392),
+                        infoWindow: const InfoWindow(
+                          title: 'Wonderland theme park',
+                          snippet: 'Lorem Ipsum'
+                        ),
+                        icon: mapIcon
+                    ),
+                    Marker(
+                        markerId: const MarkerId('science_city'),
+                        position: const LatLng(31.35732045517554, 75.44032864192994),
+                        infoWindow: const InfoWindow(
+                          title: 'Science City',
+                          snippet: 'Lorem Ipsum'
+                        ),
+                        icon: mapIcon
+                    ),
+                    Marker(
+                        markerId: const MarkerId('talhan_sahib'),
+                        position: const LatLng(31.310952110609655, 75.67027735358117),
+                        infoWindow: const InfoWindow(
+                          title: 'Talhan Sahib',
+                          snippet: 'Lorem Ipsum'
+                        ),
+                        icon: mapIcon
+                    ),
+                    Marker(
+                        markerId: const MarkerId('nikku_mark'),
+                        position: const LatLng(31.308661243957665, 75.58222942843355),
+                        infoWindow: const InfoWindow(
+                          title: 'Jalandhar Nikku Park',
+                          snippet: 'Lorem Ipsum'
+                        ),
+                        icon: mapIcon
+                    ),
+                    Marker(
+                        markerId: const MarkerId('stadium'),
+                        position: const LatLng(31.313377207469827, 75.58130889656114),
+                        infoWindow: const InfoWindow(
+                          title: 'Jalandhar Stadium',
+                          snippet: 'Lorem Ipsum'
+                        ),
+                        icon: mapIcon
+                    ),
+                  };
+                });
               },
             ),
           ),
