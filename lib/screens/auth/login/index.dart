@@ -39,10 +39,10 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool isPasswordVisible = true;
-  bool loadingLogin = false;
-  final _formKey = GlobalKey<FormState>();
-  String userEmail = '';
-  String userPassword = '';
+  bool submitBtnLoading = false;
+  final formKey = GlobalKey<FormState>();
+  String field_userEmail = '';
+  String field_userPassword = '';
 
   // styles
   final btnStylesFacebook = ElevatedButton.styleFrom(
@@ -111,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // submit login form
   void onSubmit() async {
-    final form = _formKey.currentState;
+    final form = formKey.currentState;
     if (form != null && form.validate()) {
       form.save();
 
@@ -119,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final successSnackBar = buildSnackBar(SNACKBAR_MSG_VALID_CREDS, 'success');
 
       // showing loading
-      setState(() => loadingLogin = true);
+      setState(() => submitBtnLoading = true);
       final sharedPrefs = await SharedPreferences.getInstance();
 
       try {
@@ -128,7 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // network request
         final response = await http.post(Uri.parse(userLoginApi),
-          body: {'email': userEmail, 'password': userPassword}
+          body: {'email': field_userEmail, 'password': field_userPassword}
         );
 
         print('Response status: ${response.statusCode}');
@@ -148,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
         print('Error Occurred: ${err}');
 
         // hiding loading
-        setState(() => loadingLogin = false);
+        setState(() => submitBtnLoading = false);
 
         // showing snackbar
         ScaffoldMessenger.of(context).showSnackBar(errorSnackBar);
@@ -181,6 +181,7 @@ class _LoginScreenState extends State<LoginScreen> {
           backgroundColor: Colors.transparent,
           elevation: 0,
         ),
+
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
@@ -195,26 +196,30 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: btnStylesFacebook,
                 ),
                 const SizedBox(height: 15),
+
                 ElevatedButton(
                   onPressed: () {},
                   child: const Text(LOGIN_WITH_GOOGLE),
                   style: btnStylesGoogle,
                 ),
                 const SizedBox(height: 15),
+
                 ElevatedButton(
                   onPressed: () {},
                   child: const Text(LOGIN_WITH_APPLE),
                   style: btnStylesApple,
                 ),
                 const SizedBox(height: 40),
+
                 Text(
                   OR,
                   style: orTextStyles,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 50),
-                Form(
-                    key: _formKey,
+
+                Form( // login form
+                    key: formKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -225,6 +230,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 5),
                         buildUserEmailField(),
                         const SizedBox(height: 15),
+
                         Text(
                           PASSWORD,
                           style: labelTextStyles,
@@ -237,14 +243,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 30),
                 ElevatedButton(
                   onPressed: () {
-                    if (!loadingLogin) {
+                    if (!submitBtnLoading) {
                       onSubmit();
                     }
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      loadingLogin ? const SizedBox(
+                      submitBtnLoading ? const SizedBox(
                         height: 17,
                         width: 17,
                         child: CircularProgressIndicator(
@@ -286,7 +292,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           textAlign: TextAlign.center,
                         ),
                       ),
-                      onTap: () => Navigator.pushNamed(context, signupStep1ScreenRoute),
+                      onTap: () => Navigator.pushNamed(context, signupScreenRoute),
                     ),
                   ],
                 ),
@@ -299,12 +305,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // forgot password dialog
-  Future openForgotPasswordDialog() => showDialog(
-    context: context,
-    builder: (context) => const ForgotPasswordDialog(),
-  );
-
   // field: email
   Widget buildUserEmailField() => TextFormField(
     keyboardType: TextInputType.emailAddress,
@@ -316,7 +316,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 15),
     ),
-    onSaved: (value) => setState(() => userEmail = value!),
+    onSaved: (value) => setState(() => field_userEmail = value!),
     validator: (value) {
       const emailPattern = r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
       final regExpEmail = RegExp(emailPattern);
@@ -350,7 +350,7 @@ class _LoginScreenState extends State<LoginScreen> {
         icon: isPasswordVisible ? const Icon(UniconsLine.eye_slash) : const Icon(UniconsLine.eye),
       ),
     ),
-    onSaved: (value) => setState(() => userPassword = value!),
+    onSaved: (value) => setState(() => field_userPassword = value!),
     validator: (value) {
       if (value!.isEmpty) {
         // checking for empty value
@@ -359,5 +359,95 @@ class _LoginScreenState extends State<LoginScreen> {
       return null;
     },
     autovalidateMode: AutovalidateMode.onUserInteraction,
+  );
+
+  // field: email
+  Widget buildUserEmailField_ForgotPassword() => TextFormField(
+    keyboardType: TextInputType.emailAddress,
+    decoration: InputDecoration(
+      hintText: ENTER_EMAIL_ADDRESS,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(45),
+        borderSide: const BorderSide(color: Colors.red, width: 2.0),
+      ),
+      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 15),
+    ),
+    onSaved: (value) => setState(() => field_userEmail_forgotPassword = value!),
+    validator: (value) {
+      const emailPattern = r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
+      final regExpEmail = RegExp(emailPattern);
+
+      if (value!.isEmpty) {
+        // checking for empty value
+        return ERROR_MSG_ENTER_VALUE;
+      } else if (!regExpEmail.hasMatch(value)) {
+        // checking for valid email
+        return ERROR_MSG_ENTER_EMAIL;
+      }
+      return null;
+    },
+    autovalidateMode: AutovalidateMode.onUserInteraction,
+  );
+
+  bool submitBtnLoading_forgotPassword = false;
+  String field_userEmail_forgotPassword = '';
+  final formKey_forgotPassword = GlobalKey<FormState>();
+
+  // submit forgot password form
+  void onSubmit_forgotPassword() async {
+    final form = formKey_forgotPassword.currentState;
+    if (form != null && form.validate()) {
+      form.save();
+
+      final errorSnackBar = buildSnackBar(SNACKBAR_MSG_INVALID_CREDS, 'error');
+      final successSnackBar = buildSnackBar(SNACKBAR_MSG_VALID_CREDS, 'success');
+
+      // showing loading
+      setState(() => submitBtnLoading_forgotPassword = true);
+
+      try {
+        // unfocus the inputs
+        FocusManager.instance.primaryFocus?.unfocus();
+
+        // network request
+        // final response = await http.post(Uri.parse(userLoginApi),
+        //     body: {'email': field_userEmail}
+        // );
+
+        // print('Response status: ${response.statusCode}');
+
+        await Future.delayed(const Duration(seconds: 3));
+        // showing snackbar
+        ScaffoldMessenger.of(context).showSnackBar(successSnackBar);
+
+        // hiding loading
+        // setState(() => submitBtnLoading_forgotPassword = false);
+
+        // navigate to main screen and remove all the history
+        // await Future.delayed(const Duration(seconds: 2));
+        // Navigator.pushNamedAndRemoveUntil(context, contentMainScreenRoute, (r) => false);
+      } catch (err) {
+        print('Error Occurred: ${err}');
+
+        // hiding loading
+        // setState(() => submitBtnLoading_forgotPassword = false);
+
+        // showing snackbar
+        ScaffoldMessenger.of(context).showSnackBar(errorSnackBar);
+      }
+    }
+  }
+  // forgot password dialog
+  Future openForgotPasswordDialog() => showDialog(
+    context: context,
+    builder: (context) => ForgotPasswordDialog(
+      pageHeadingStyles: pageHeadingStyles,
+      additionalTextStyles: additionalTextStyles,
+      buildUserEmailField: buildUserEmailField_ForgotPassword(),
+      submitBtnLoading: submitBtnLoading_forgotPassword,
+      btnStylesSubmit: btnStylesSubmit,
+      onSubmit: onSubmit_forgotPassword,
+      formKey: formKey_forgotPassword
+    ),
   );
 }

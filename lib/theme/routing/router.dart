@@ -6,6 +6,7 @@ import 'package:app/theme/routing/routing_constants.dart';
 // SCREENS
 import 'package:app/screens/initials/index.dart';
 // auth
+import 'package:app/screens/auth/signup/index.dart';
 import 'package:app/screens/auth/signup/steps/signupStep1.dart';
 import 'package:app/screens/auth/signup/steps/signupStep2.dart';
 import 'package:app/screens/auth/login/index.dart';
@@ -24,6 +25,9 @@ Route<dynamic> generateRoutes(RouteSettings settings) {
   switch(settings.name) {
     case initialScreenRoute:
       return MaterialPageRoute(builder: (context) => const InitialScreen());
+
+    case signupScreenRoute:
+      return MaterialPageRoute(builder: (context) => const SignUpScreen());
 
     case signupStep1ScreenRoute:
       return MaterialPageRoute(builder: (context) => const SignUpStep1Screen());
