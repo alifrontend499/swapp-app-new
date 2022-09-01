@@ -29,11 +29,11 @@ Route<dynamic> generateRoutes(RouteSettings settings) {
     case signupScreenRoute:
       return MaterialPageRoute(builder: (context) => const SignUpScreen());
 
-    case signupStep1ScreenRoute:
-      return MaterialPageRoute(builder: (context) => const SignUpStep1Screen());
-
-    case signupStep2ScreenRoute:
-      return MaterialPageRoute(builder: (context) => const SignUpStep2Screen());
+    // case signupStep1ScreenRoute:
+    //   return MaterialPageRoute(builder: (context) => const SignUpStep1Screen());
+    //
+    // case signupStep2ScreenRoute:
+    //   return MaterialPageRoute(builder: (context) => const SignUpStep2Screen());
 
     case loginScreenRoute:
       return MaterialPageRoute(builder: (context) => const LoginScreen());

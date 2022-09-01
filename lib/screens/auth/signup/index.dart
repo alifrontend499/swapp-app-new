@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:app/screens/auth/signup/steps/signupStep1.dart';
+import 'package:app/screens/auth/signup/steps/signupStep2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -31,6 +33,8 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  bool submitBtnLoading = false;
+  
   int currentStep = 1;
   bool isPasswordVisible = true;
   bool isConfirmPasswordVisible = true;
@@ -139,6 +143,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
+  // on submit of the form
+  void onSubmit() async {
+    final form = formKey.currentState;
+
+    if(currentStep == 1) {
+      // changing to 2nd step
+      setState(() => {
+        currentStep = 2
+      });
+    } else {
+      // showing loading
+      setState(() => {
+        submitBtnLoading = true
+      });
+      
+      await Future.delayed(const Duration(seconds: 2));
+
+      // hiding loading
+      setState(() => {
+        submitBtnLoading = false
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -172,7 +200,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
             children: [
               // child | top Part
               Expanded(
-                  child: currentStep == 1 ? signUpStep1() : signUpStep2()
+                  child: Form(
+                    key: formKey,
+                    child: currentStep == 1 ? SignUpStep1(
+                      showImageOptions: showImageOptions,
+                      image: image,
+                      userImageBtnStyle: userImageBtnStyle,
+                      chooseImageTextStyles: chooseImageTextStyles,
+                      labelTextStyles: labelTextStyles,
+                      buildUserEmailField: buildUserEmailField(),
+                      buildUserPasswordField: buildUserPasswordField(),
+                      buildUserConfirmPasswordField: buildUserConfirmPasswordField()
+                    ) : SignUpStep2(
+                      showImageOptions: showImageOptions,
+                      image: image,
+                      userImageBtnStyle: userImageBtnStyle,
+                      chooseImageTextStyles: chooseImageTextStyles,
+                      labelTextStyles: labelTextStyles,
+                      buildUserUsernameField: buildUserUsernameField(),
+                      buildUserJobTitleField: buildUserJobTitleField(),
+                      buildUserIndustryField: buildUserIndustryField()
+                    ),
+                  ),
               ),
 
               // child | bottom Part
@@ -224,15 +273,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
-                              if(currentStep == 1) {
-                                setState(() {
-                                  currentStep = 2;
-                                });
-                              } else if(currentStep == 2) {
-
+                              if(!submitBtnLoading) {
+                                onSubmit();
                               }
                             },
-                            child: currentStep == 1 ? const Text(STEP_NEXT) : const Text(SIGNUP_SUBMIT),
+                            // child: currentStep == 1 ? const Text(STEP_NEXT) : const Text(SIGNUP_SUBMIT),
+                            child: submitBtnLoading ? const SizedBox(
+                              height: 17,
+                              width: 17,
+                              child: CircularProgressIndicator(
+                                color: Colors.black,
+                                strokeWidth: 2,
+                              ),
+                            ) : Text(currentStep == 1 ? STEP_NEXT : SIGNUP_SUBMIT),
                             style: btnBottomNextStyles,
                           ),
                         ),
@@ -248,126 +301,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  // STEPS
-  // step 1
-  Widget signUpStep1() => SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // child | image selector
-          Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // child | image selector
-                ElevatedButton(
-                  onPressed: () => showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (context) => showImageOptions(),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(15)
-                      ),
-                    ),
-                  ),
-                  child: image != null ? ClipRRect(
-                    child: Image.file(
-                      image!,
-                      height: 105,
-                      width: 105,
-                      fit: BoxFit.cover,
-                    ),
-                    borderRadius: BorderRadius.circular(50),
-                  ) : const Icon(
-                    UniconsLine.camera,
-                    size: 35,
-                  ),
-                  style: userImageBtnStyle,
-                ),
-                const SizedBox(height: 10),
-
-                // child | text
-                Text(
-                  CHOOSE_IMAGE,
-                  style: chooseImageTextStyles,
-                ),
-              ]
-          ),
-          const SizedBox(height: 30),
-
-          // child | field | email address
-          Text(
-            EMAIL_ADDRESS,
-            style: labelTextStyles,
-          ),
-          const SizedBox(height: 5),
-
-          buildUserEmailField(),
-          const SizedBox(height: 15),
-
-          // child | field | password
-          Text(
-            PASSWORD,
-            style: labelTextStyles,
-          ),
-          const SizedBox(height: 5),
-
-          buildUserPasswordField(),
-          const SizedBox(height: 15),
-
-          // child | field | confirm password
-          Text(
-            CONFIRM_PASSWORD,
-            style: labelTextStyles,
-          ),
-          const SizedBox(height: 5),
-
-          buildUserConfirmPasswordField(),
-          const SizedBox(height: 15),
-        ],
-      )
-  );
-
-  // step 2
-  Widget signUpStep2() => SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // child | field | name
-          Text(
-            YOUR_NAME,
-            style: labelTextStyles,
-          ),
-          const SizedBox(height: 5),
-
-          buildUserUsernameField(),
-          const SizedBox(height: 15),
-
-          // child | field | job title
-          Text(
-            YOUR_JOB_TITLE,
-            style: labelTextStyles,
-          ),
-          const SizedBox(height: 5),
-
-          buildUserJobTitleField(),
-          const SizedBox(height: 15),
-
-          // child | field | industry
-          Text(
-            YOUR_INDUSTRY,
-            style: labelTextStyles,
-          ),
-          const SizedBox(height: 5),
-
-          buildUserIndustryField(),
-          const SizedBox(height: 15),
-        ],
-      )
-  );
-
   // FIELDS
   // field: email
   Widget buildUserEmailField() => TextFormField(
@@ -381,6 +314,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 15),
     ),
     onSaved: (value) => setState(() => field_userEmail = value!),
+    onChanged: (value) => setState(() => field_userEmail = value!),
+    initialValue: field_userEmail,
     validator: (value) {
       const emailPattern = r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
       final regExpEmail = RegExp(emailPattern);
@@ -419,6 +354,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
     ),
     onSaved: (value) => setState(() => field_userPassword = value!),
+    onChanged: (value) => setState(() => field_userPassword = value!),
+    initialValue: field_userPassword,
     validator: (value) {
       if (value!.isEmpty) {
         // checking for empty value
@@ -451,6 +388,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
     ),
     onSaved: (value) => setState(() => field_userConfirmPassword = value!),
+    onChanged: (value) => setState(() => field_userConfirmPassword = value!),
+    initialValue: field_userConfirmPassword,
     validator: (value) {
       if (value!.isEmpty) {
         // checking for empty value
@@ -475,7 +414,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 15),
     ),
     onSaved: (value) => setState(() => field_userName = value!),
-    initialValue: '',
+    onChanged: (value) => setState(() => field_userName = value!),
+    initialValue: field_userName,
     validator: (value) {
       if (value!.isEmpty) {
         // checking for empty value
@@ -497,6 +437,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 15),
     ),
     onSaved: (value) => setState(() => field_jobTitle = value!),
+    onChanged: (value) => setState(() => field_jobTitle = value!),
+    initialValue: field_jobTitle,
     validator: (value) {
       if (value!.isEmpty) {
         // checking for empty value
@@ -518,6 +460,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 15),
     ),
     onSaved: (value) => setState(() => field_industry = value!),
+    onChanged: (value) => setState(() => field_industry = value!),
+    initialValue: field_industry,
     validator: (value) {
       if (value!.isEmpty) {
         // checking for empty value

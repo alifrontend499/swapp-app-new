@@ -190,8 +190,8 @@ class _ContentMainScreenState extends State<ContentMainScreen> {
     // hide all existing snackbar
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     // showing snack bar
-    final successSnackBar = buildSnackBar(COMMON_LOGOUT_SUCCESS, 'success');
-    ScaffoldMessenger.of(context).showSnackBar(successSnackBar);
+    // final successSnackBar = buildSnackBar(COMMON_LOGOUT_SUCCESS, 'success');
+    // ScaffoldMessenger.of(context).showSnackBar(successSnackBar);
 
     // navigate to initial screen after logout
     await Future.delayed(const Duration(seconds: 1));

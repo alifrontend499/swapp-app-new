@@ -17,6 +17,9 @@ import 'package:app/theme/colors.dart';
 // search
 import 'package:app/screens/content/mapContent/search/index.dart';
 
+// route
+import 'package:app/theme/routing/routing_constants.dart';
+
 
 class MapContent extends StatefulWidget {
   const MapContent({Key? key}) : super(key: key);
@@ -41,7 +44,6 @@ class _MapContentState extends State<MapContent> {
     // loading map Icon
     BitmapDescriptor.fromAssetImage(
       const ImageConfiguration(
-        size: Size(50, 50)
       ),
       'assets/icons/map-icon.png'
     ).then((value) => mapIcon = value);
@@ -98,95 +100,79 @@ class _MapContentState extends State<MapContent> {
         ],
       ),
 
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // child | map view
-          Expanded(
-            child: GoogleMap(
-              initialCameraPosition: _posIndia,
-              markers: mapMarkers,
-              mapToolbarEnabled: false,
-              onMapCreated: (GoogleMapController controller) {
-                _controller.complete(controller);
-                controller.setMapStyle(defaultMapStyle);
+      body: GoogleMap(
+        initialCameraPosition: _posIndia,
+        markers: mapMarkers,
+        mapToolbarEnabled: false,
+        onMapCreated: (GoogleMapController controller) {
+          _controller.complete(controller);
+          controller.setMapStyle(defaultMapStyle);
 
-                setState(() {
-                  mapMarkers = {
-                    Marker(
-                        markerId: const MarkerId('devi_talab'),
-                        position: const LatLng(31.338613462594523, 75.56284504008605),
-                        infoWindow: const InfoWindow(
-                          title: 'Devi Talab Mandir',
-                          snippet: 'Lorem Ipsum'
-                        ),
-                        icon: mapIcon
-                    ),
-                    Marker(
-                        markerId: const MarkerId('wonderland'),
-                        position: const LatLng(31.26307300041686, 75.53283375542392),
-                        infoWindow: const InfoWindow(
-                          title: 'Wonderland theme park',
-                          snippet: 'Lorem Ipsum'
-                        ),
-                        icon: mapIcon
-                    ),
-                    Marker(
-                        markerId: const MarkerId('science_city'),
-                        position: const LatLng(31.35732045517554, 75.44032864192994),
-                        infoWindow: const InfoWindow(
-                          title: 'Science City',
-                          snippet: 'Lorem Ipsum'
-                        ),
-                        icon: mapIcon
-                    ),
-                    Marker(
-                        markerId: const MarkerId('talhan_sahib'),
-                        position: const LatLng(31.310952110609655, 75.67027735358117),
-                        infoWindow: const InfoWindow(
-                          title: 'Talhan Sahib',
-                          snippet: 'Lorem Ipsum'
-                        ),
-                        icon: mapIcon
-                    ),
-                    Marker(
-                        markerId: const MarkerId('nikku_mark'),
-                        position: const LatLng(31.308661243957665, 75.58222942843355),
-                        infoWindow: const InfoWindow(
-                          title: 'Jalandhar Nikku Park',
-                          snippet: 'Lorem Ipsum'
-                        ),
-                        icon: mapIcon
-                    ),
-                    Marker(
-                        markerId: const MarkerId('stadium'),
-                        position: const LatLng(31.313377207469827, 75.58130889656114),
-                        infoWindow: const InfoWindow(
-                          title: 'Jalandhar Stadium',
-                          snippet: 'Lorem Ipsum'
-                        ),
-                        icon: mapIcon
-                    ),
-                  };
-                });
-              },
-            ),
-          ),
-
-          // Positioned(
-          //   top: 40,
-          //   left: 15,
-          //   child: IconButton(
-          //     splashColor: Colors.red,
-          //     onPressed: () {},
-          //     iconSize: 40,
-          //     color: Colors.white,
-          //     icon: const Icon(
-          //       UniconsLine.bars,
-          //     ),
-          //   ),
-          // ),
-        ],
+          setState(() {
+            mapMarkers = {
+              Marker(
+                markerId: const MarkerId('devi_talab'),
+                position: const LatLng(31.338613462594523, 75.56284504008605),
+                infoWindow: InfoWindow(
+                  title: 'Devi Talab Mandir',
+                  snippet: 'Lorem Ipsum',
+                  onTap: () => Navigator.pushNamed(context, vendorViewScreenRoute),
+                ),
+                icon: mapIcon,
+              ),
+              Marker(
+                markerId: const MarkerId('wonderland'),
+                position: const LatLng(31.26307300041686, 75.53283375542392),
+                infoWindow: InfoWindow(
+                  title: 'Wonderland theme park',
+                  snippet: 'Lorem Ipsum',
+                  onTap: () => Navigator.pushNamed(context, vendorViewScreenRoute),
+                ),
+                icon: mapIcon,
+              ),
+              Marker(
+                markerId: const MarkerId('science_city'),
+                position: const LatLng(31.35732045517554, 75.44032864192994),
+                infoWindow: InfoWindow(
+                  title: 'Science City',
+                  snippet: 'Lorem Ipsum',
+                  onTap: () => Navigator.pushNamed(context, vendorViewScreenRoute),
+                ),
+                icon: mapIcon,
+              ),
+              Marker(
+                markerId: const MarkerId('talhan_sahib'),
+                position: const LatLng(31.310952110609655, 75.67027735358117),
+                infoWindow: InfoWindow(
+                  title: 'Talhan Sahib',
+                  snippet: 'Lorem Ipsum',
+                  onTap: () => Navigator.pushNamed(context, vendorViewScreenRoute),
+                ),
+                icon: mapIcon,
+              ),
+              Marker(
+                markerId: const MarkerId('nikku_mark'),
+                position: const LatLng(31.308661243957665, 75.58222942843355),
+                infoWindow: InfoWindow(
+                  title: 'Jalandhar Nikku Park',
+                  snippet: 'Lorem Ipsum',
+                  onTap: () => Navigator.pushNamed(context, vendorViewScreenRoute),
+                ),
+                icon: mapIcon,
+              ),
+              Marker(
+                markerId: const MarkerId('stadium'),
+                position: const LatLng(31.313377207469827, 75.58130889656114),
+                infoWindow: InfoWindow(
+                  title: 'Jalandhar Stadium',
+                  snippet: 'Lorem Ipsum',
+                  onTap: () => Navigator.pushNamed(context, vendorViewScreenRoute),
+                ),
+                icon: mapIcon,
+              ),
+            };
+          });
+        },
       ),
     );
   }
