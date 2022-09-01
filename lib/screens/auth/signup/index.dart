@@ -45,34 +45,34 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   // styles
   final labelTextStyles = GoogleFonts.montserrat(
-      fontSize: 14,
-      fontWeight: FontWeight.w600
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
   );
   final chooseImageTextStyles = GoogleFonts.montserrat(
-      fontSize: 15,
-      fontWeight: FontWeight.w500
+    fontSize: 15,
+    fontWeight: FontWeight.w500,
   );
   final optionTextStyles = GoogleFonts.montserrat(
     fontSize: 15,
   );
   final progressTextStyle = GoogleFonts.montserrat(
-      fontSize: 15,
-      fontWeight: FontWeight.w600,
-      color: Colors.black
+    fontSize: 15,
+    fontWeight: FontWeight.w600,
+    color: Colors.black,
   );
   final btnBottomNextStyles = ElevatedButton.styleFrom(
     splashFactory: NoSplash.splashFactory,
     minimumSize: const Size(double.minPositive, 48),
     shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(40)
+      borderRadius: BorderRadius.circular(40)
     ),
     primary: appPrimaryBtnColor,
     onPrimary: appPrimaryBtnColorOnPrimary,
     textStyle: GoogleFonts.montserrat(
-        textStyle: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600
-        )
+      textStyle: const TextStyle(
+        fontSize: 15,
+        fontWeight: FontWeight.w600
+      ),
     ),
   );
   final btnBottomPrevStyles = ElevatedButton.styleFrom(
@@ -85,8 +85,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     onPrimary: appGrayBtnColorOnPrimary,
     textStyle: GoogleFonts.montserrat(
       textStyle: const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w600
+        fontSize: 15,
+        fontWeight: FontWeight.w600
       ),
     ),
   );
@@ -475,6 +475,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 15),
     ),
     onSaved: (value) => setState(() => field_userName = value!),
+    initialValue: '',
     validator: (value) {
       if (value!.isEmpty) {
         // checking for empty value
