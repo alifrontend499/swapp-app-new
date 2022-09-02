@@ -8,6 +8,7 @@ import 'package:app/screens/auth/signup/const/textConsts.dart';
 import 'package:unicons/unicons.dart';
 
 class SignUpStep1 extends StatelessWidget {
+  final GlobalKey formKey;
   final Function showImageOptions;
   final File? image;
   final ButtonStyle userImageBtnStyle;
@@ -20,6 +21,7 @@ class SignUpStep1 extends StatelessWidget {
 
   const SignUpStep1({
     Key? key,
+    required this.formKey,
     required this.showImageOptions,
     required this.image,
     required this.userImageBtnStyle,
@@ -33,7 +35,9 @@ class SignUpStep1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
+      physics: const BouncingScrollPhysics(),
+      child: Form(
+        key: formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -108,7 +112,8 @@ class SignUpStep1 extends StatelessWidget {
             buildUserConfirmPasswordField,
             const SizedBox(height: 15),
           ],
-        )
+        ),
+      ),
     );
   }
 }

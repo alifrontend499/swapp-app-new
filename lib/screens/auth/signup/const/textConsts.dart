@@ -21,3 +21,6 @@ const String YOUR_INDUSTRY = 'Industry';
 const String ENTER_INDUSTRY = 'Enter your industry';
 
 const String PERSONAL_DETAILS = 'Personal Details';
+
+const String SNACKBAR_MSG_UNKNOWN_ERROR = 'Unknown error occured please try again';
+const String SNACKBAR_MSG_SIGNUP_SUCCESSFULL = 'Sign up Successful. please login';

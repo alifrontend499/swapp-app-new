@@ -8,6 +8,7 @@ import 'package:app/screens/auth/signup/const/textConsts.dart';
 import 'package:unicons/unicons.dart';
 
 class SignUpStep2 extends StatelessWidget {
+  final GlobalKey formKey;
   final Function showImageOptions;
   final File? image;
   final ButtonStyle userImageBtnStyle;
@@ -20,6 +21,7 @@ class SignUpStep2 extends StatelessWidget {
 
   const SignUpStep2({
     Key? key,
+    required this.formKey,
     required this.showImageOptions,
     required this.image,
     required this.userImageBtnStyle,
@@ -34,40 +36,43 @@ class SignUpStep2 extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // child | field | name
-            Text(
-              YOUR_NAME,
-              style: labelTextStyles,
-            ),
-            const SizedBox(height: 5),
+        child: Form(
+          key: formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // child | field | name
+              Text(
+                YOUR_NAME,
+                style: labelTextStyles,
+              ),
+              const SizedBox(height: 5),
 
-            buildUserUsernameField,
-            const SizedBox(height: 15),
+              buildUserUsernameField,
+              const SizedBox(height: 15),
 
-            // child | field | job title
-            Text(
-              YOUR_JOB_TITLE,
-              style: labelTextStyles,
-            ),
-            const SizedBox(height: 5),
+              // child | field | job title
+              Text(
+                YOUR_JOB_TITLE,
+                style: labelTextStyles,
+              ),
+              const SizedBox(height: 5),
 
-            buildUserJobTitleField,
-            const SizedBox(height: 15),
+              buildUserJobTitleField,
+              const SizedBox(height: 15),
 
-            // child | field | industry
-            Text(
-              YOUR_INDUSTRY,
-              style: labelTextStyles,
-            ),
-            const SizedBox(height: 5),
+              // child | field | industry
+              Text(
+                YOUR_INDUSTRY,
+                style: labelTextStyles,
+              ),
+              const SizedBox(height: 5),
 
-            buildUserIndustryField,
-            const SizedBox(height: 15),
-          ],
-        )
+              buildUserIndustryField,
+              const SizedBox(height: 15),
+            ],
+          ),
+        ),
     );
   }
 }

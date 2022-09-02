@@ -1,20 +1,18 @@
 import 'dart:io';
-import 'package:app/screens/auth/signup/steps/signupStep1.dart';
-import 'package:app/screens/auth/signup/steps/signupStep2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // app consts
 import 'package:app/theme/commonConst/textConsts.dart';
 
+// page consts
+import 'package:app/screens/auth/signup/const/textConsts.dart';
+
 // google fonts
 import 'package:google_fonts/google_fonts.dart';
 
 // colors
 import 'package:app/theme/colors.dart';
-
-// page text
-import 'package:app/screens/auth/signup/const/textConsts.dart';
 
 // icons
 import 'package:unicons/unicons.dart';
@@ -24,6 +22,19 @@ import 'package:app/theme/routing/routing_constants.dart';
 
 // image picker
 import 'package:image_picker/image_picker.dart';
+
+// common components
+import 'package:app/theme/commonComponents/snackBar.dart';
+
+// signup steps
+import 'package:app/screens/auth/signup/steps/signupStep1.dart';
+import 'package:app/screens/auth/signup/steps/signupStep2.dart';
+
+// http
+import 'package:http/http.dart' as http;
+
+// apis urls
+import 'package:app/theme/apis/api_urls.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -39,7 +50,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool isPasswordVisible = true;
   bool isConfirmPasswordVisible = true;
 
-  final formKey = GlobalKey<FormState>();
+  final step1_formKey = GlobalKey<FormState>();
+  final step2_formKey = GlobalKey<FormState>();
+
   String field_userEmail = '';
   String field_userPassword = '';
   String field_userConfirmPassword = '';
@@ -144,27 +157,83 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   // on submit of the form
-  void onSubmit() async {
-    final form = formKey.currentState;
+  void onSubmit_step1() {
+    final form = step1_formKey.currentState;
 
-    if(currentStep == 1) {
+    // unfocused the inputs
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    if(form != null && form.validate()) {
       // changing to 2nd step
       setState(() => {
         currentStep = 2
       });
-    } else {
+    }
+  }
+
+  // on submit of the form
+  void onSubmit_step2() async {
+    final form = step2_formKey.currentState;
+
+    final errorSnackBar = buildSnackBar(SNACKBAR_MSG_UNKNOWN_ERROR, 'error');
+    final successSnackBar = buildSnackBar(SNACKBAR_MSG_SIGNUP_SUCCESSFULL, 'success');
+
+    // unfocused the inputs
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    if(form != null && form.validate()) {
       // showing loading
       setState(() => {
         submitBtnLoading = true
       });
-      
-      await Future.delayed(const Duration(seconds: 2));
 
-      // hiding loading
-      setState(() => {
-        submitBtnLoading = false
-      });
+      try {
+        // network request
+        final response = await http.post(Uri.parse(userSignupApi),
+            body: {
+              'userEmail': field_userEmail,
+              'password': field_userPassword,
+              'userName': field_userName,
+              'jobTitle': field_jobTitle,
+              'industry': field_industry,
+            }
+        );
+        print('Response status: ${response.statusCode}');
+
+        // showing snack
+        ScaffoldMessenger.of(context).showSnackBar(successSnackBar);
+
+        // hiding loading
+        setState(() => {
+          submitBtnLoading = false
+        });
+
+        // navigate to login screen after 3 seconds
+        await Future.delayed(const Duration(seconds: 3));
+        Navigator.pushNamed(context, loginScreenRoute);
+        // Navigator.pushNamedAndRemoveUntil(context, loginScreenRoute, (r) => false);
+      } catch (err) {
+        print('Error Occurred: $err');
+
+        // hiding loading
+        setState(() => submitBtnLoading = false);
+
+        // showing snack
+        ScaffoldMessenger.of(context).showSnackBar(errorSnackBar);
+      }
     }
+
+    // if(currentStep == 1) {
+    //   // changing to 2nd step
+    //   setState(() => {
+    //     currentStep = 2
+    //   });
+    // } else {
+    //   // showing loading
+    //   setState(() => {
+    //     submitBtnLoading = true
+    //   });
+    // }
   }
 
   @override
@@ -200,27 +269,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
             children: [
               // child | top Part
               Expanded(
-                  child: Form(
-                    key: formKey,
-                    child: currentStep == 1 ? SignUpStep1(
-                      showImageOptions: showImageOptions,
-                      image: image,
-                      userImageBtnStyle: userImageBtnStyle,
-                      chooseImageTextStyles: chooseImageTextStyles,
-                      labelTextStyles: labelTextStyles,
-                      buildUserEmailField: buildUserEmailField(),
-                      buildUserPasswordField: buildUserPasswordField(),
-                      buildUserConfirmPasswordField: buildUserConfirmPasswordField()
-                    ) : SignUpStep2(
-                      showImageOptions: showImageOptions,
-                      image: image,
-                      userImageBtnStyle: userImageBtnStyle,
-                      chooseImageTextStyles: chooseImageTextStyles,
-                      labelTextStyles: labelTextStyles,
-                      buildUserUsernameField: buildUserUsernameField(),
-                      buildUserJobTitleField: buildUserJobTitleField(),
-                      buildUserIndustryField: buildUserIndustryField()
-                    ),
+                child: currentStep == 1 ? SignUpStep1(
+                    formKey: step1_formKey,
+                    showImageOptions: showImageOptions,
+                    image: image,
+                    userImageBtnStyle: userImageBtnStyle,
+                    chooseImageTextStyles: chooseImageTextStyles,
+                    labelTextStyles: labelTextStyles,
+                    buildUserEmailField: buildUserEmailField(),
+                    buildUserPasswordField: buildUserPasswordField(),
+                    buildUserConfirmPasswordField: buildUserConfirmPasswordField()
+                  ) : SignUpStep2(
+                    formKey: step2_formKey,
+                    showImageOptions: showImageOptions,
+                    image: image,
+                    userImageBtnStyle: userImageBtnStyle,
+                    chooseImageTextStyles: chooseImageTextStyles,
+                    labelTextStyles: labelTextStyles,
+                    buildUserUsernameField: buildUserUsernameField(),
+                    buildUserJobTitleField: buildUserJobTitleField(),
+                    buildUserIndustryField: buildUserIndustryField()
                   ),
               ),
 
@@ -274,7 +342,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           child: ElevatedButton(
                             onPressed: () {
                               if(!submitBtnLoading) {
-                                onSubmit();
+                                if(currentStep == 1) {
+                                  onSubmit_step1();
+                                } else {
+                                  onSubmit_step2();
+                                }
                               }
                             },
                             // child: currentStep == 1 ? const Text(STEP_NEXT) : const Text(SIGNUP_SUBMIT),
@@ -313,7 +385,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 15),
     ),
-    onSaved: (value) => setState(() => field_userEmail = value!),
+    // onSaved: (value) => setState(() => field_userEmail = value!),
     onChanged: (value) => setState(() => field_userEmail = value!),
     initialValue: field_userEmail,
     validator: (value) {
@@ -353,7 +425,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             : const Icon(UniconsLine.eye),
       ),
     ),
-    onSaved: (value) => setState(() => field_userPassword = value!),
+    // onSaved: (value) => setState(() => field_userPassword = value!),
     onChanged: (value) => setState(() => field_userPassword = value!),
     initialValue: field_userPassword,
     validator: (value) {
@@ -387,7 +459,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             : const Icon(UniconsLine.eye),
       ),
     ),
-    onSaved: (value) => setState(() => field_userConfirmPassword = value!),
+    // onSaved: (value) => setState(() => field_userConfirmPassword = value!),
     onChanged: (value) => setState(() => field_userConfirmPassword = value!),
     initialValue: field_userConfirmPassword,
     validator: (value) {
@@ -413,7 +485,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 15),
     ),
-    onSaved: (value) => setState(() => field_userName = value!),
+    // onSaved: (value) => setState(() => field_userName = value!),
     onChanged: (value) => setState(() => field_userName = value!),
     initialValue: field_userName,
     validator: (value) {
@@ -436,7 +508,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 15),
     ),
-    onSaved: (value) => setState(() => field_jobTitle = value!),
+    // onSaved: (value) => setState(() => field_jobTitle = value!),
     onChanged: (value) => setState(() => field_jobTitle = value!),
     initialValue: field_jobTitle,
     validator: (value) {
@@ -459,7 +531,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 15),
     ),
-    onSaved: (value) => setState(() => field_industry = value!),
+    // onSaved: (value) => setState(() => field_industry = value!),
     onChanged: (value) => setState(() => field_industry = value!),
     initialValue: field_industry,
     validator: (value) {

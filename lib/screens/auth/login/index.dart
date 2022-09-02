@@ -123,7 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final sharedPrefs = await SharedPreferences.getInstance();
 
       try {
-        // unfocus the inputs
+        // unfocused the inputs
         FocusManager.instance.primaryFocus?.unfocus();
 
         // network request
@@ -133,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         print('Response status: ${response.statusCode}');
 
-        // showing snackbar
+        // showing snack
         ScaffoldMessenger.of(context).showSnackBar(successSnackBar);
 
         // removing value from shared preferences
@@ -145,12 +145,12 @@ class _LoginScreenState extends State<LoginScreen> {
         await Future.delayed(const Duration(seconds: 2));
         Navigator.pushNamedAndRemoveUntil(context, contentMainScreenRoute, (r) => false);
       } catch (err) {
-        print('Error Occurred: ${err}');
+        print('Error Occurred: $err');
 
         // hiding loading
         setState(() => submitBtnLoading = false);
 
-        // showing snackbar
+        // showing snack
         ScaffoldMessenger.of(context).showSnackBar(errorSnackBar);
       }
     }
