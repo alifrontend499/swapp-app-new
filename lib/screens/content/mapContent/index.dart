@@ -38,6 +38,8 @@ class _MapContentState extends State<MapContent> {
     // TODO: implement initState
     super.initState();
 
+    print('hello how are you');
+
     // loading map styles
     DefaultAssetBundle.of(context).loadString('assets/mapStyles/default_style.json').then((value) => defaultMapStyle = value);
 

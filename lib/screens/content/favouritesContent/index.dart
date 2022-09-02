@@ -21,6 +21,9 @@ import 'package:app/screens/content/const/textConsts.dart';
 // icons
 import 'package:unicons/unicons.dart';
 
+// http
+import 'package:http/http.dart' as http;
+
 class FavouritesContent extends StatefulWidget {
   const FavouritesContent({Key? key}) : super(key: key);
 
@@ -121,6 +124,19 @@ class _FavouritesContentState extends State<FavouritesContent> {
       'isFav': true,
     },
   ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    print('calling api');
+    getFavouritesData();
+  }
+
+  Future getFavouritesData() async {
+   final response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/posts'));
+   print('response $response');
+  }
 
   // functions
   Future<void> onRefresh() {
