@@ -176,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             color: Colors.black,
             splashColor: Colors.transparent,
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pushNamed(context, initialScreenRoute),
           ),
           backgroundColor: Colors.transparent,
           elevation: 0,

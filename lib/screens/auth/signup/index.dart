@@ -222,18 +222,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ScaffoldMessenger.of(context).showSnackBar(errorSnackBar);
       }
     }
-
-    // if(currentStep == 1) {
-    //   // changing to 2nd step
-    //   setState(() => {
-    //     currentStep = 2
-    //   });
-    // } else {
-    //   // showing loading
-    //   setState(() => {
-    //     submitBtnLoading = true
-    //   });
-    // }
   }
 
   @override
