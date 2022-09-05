@@ -127,15 +127,12 @@ class _FavouritesContentState extends State<FavouritesContent> {
 
   @override
   void initState() {
-    super.initState();
-
-    print('calling api');
-    getFavouritesData();
+    print('page navigated favourites');
   }
 
   Future getFavouritesData() async {
    final response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/posts'));
-   print('response $response');
+   print('response here $response');
   }
 
   // functions

@@ -73,6 +73,11 @@ class _SwappSpotsContentState extends State<SwappSpotsContent> {
     fontSize: 15
   );
 
+  @override
+  void initState() {
+    print('page navigated sports');
+  }
+
   // data
   List<Map<String, dynamic>> swappSpots = [
     {

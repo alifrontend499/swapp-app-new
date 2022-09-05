@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 // app consts
@@ -122,28 +124,49 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() => submitBtnLoading = true);
       final sharedPrefs = await SharedPreferences.getInstance();
 
+      // closing all the existing snack bars
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
       try {
         // unfocused the inputs
         FocusManager.instance.primaryFocus?.unfocus();
 
         // network request
-        final response = await http.post(Uri.parse(userLoginApi),
-          body: {'email': field_userEmail, 'password': field_userPassword}
+        final response = await http.post(
+          Uri.parse(userLoginApi),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(<String, String>{
+            'userEmail': field_userEmail,
+            'password': field_userPassword
+          })
         );
 
-        print('Response status: ${response.statusCode}');
+        final responseData = jsonDecode(response.body);
+        final responseStatus = response.statusCode;
 
-        // showing snack
-        ScaffoldMessenger.of(context).showSnackBar(successSnackBar);
+        if(responseStatus == 401) { // unauthorized access
+          // showing snack
+          ScaffoldMessenger.of(context).showSnackBar(errorSnackBar);
+        }
 
-        // removing value from shared preferences
-        sharedPrefs.remove(SHARED_PREF_KEY_IS_USER_LOGGED_IN);
-        // setting value in shared preferences
-        sharedPrefs.setBool(SHARED_PREF_KEY_IS_USER_LOGGED_IN, true);
+        if(responseStatus == 200) { // user found
+          // showing snack
+          ScaffoldMessenger.of(context).showSnackBar(successSnackBar);
 
-        // navigate to main screen and remove all the history
-        await Future.delayed(const Duration(seconds: 2));
-        Navigator.pushNamedAndRemoveUntil(context, contentMainScreenRoute, (r) => false);
+          // removing value from shared preferences
+          sharedPrefs.remove(SHARED_PREF_KEY_IS_USER_LOGGED_IN);
+          // setting value in shared preferences
+          sharedPrefs.setBool(SHARED_PREF_KEY_IS_USER_LOGGED_IN, true);
+
+          // navigate to main screen and removing all the previous history
+          await Future.delayed(const Duration(seconds: 2));
+          Navigator.pushNamedAndRemoveUntil(context, contentMainScreenRoute, (r) => false);
+        }
+
+        // hiding loading
+        setState(() => submitBtnLoading = false);
       } catch (err) {
         print('Error Occurred: $err');
 

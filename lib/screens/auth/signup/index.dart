@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -190,28 +191,36 @@ class _SignUpScreenState extends State<SignUpScreen> {
       try {
         // network request
         final response = await http.post(Uri.parse(userSignupApi),
-            body: {
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: jsonEncode(<String, String>{
               'userEmail': field_userEmail,
               'password': field_userPassword,
               'userName': field_userName,
               'jobTitle': field_jobTitle,
               'industry': field_industry,
-            }
+            })
         );
-        print('Response status: ${response.statusCode}');
+        final responseData = jsonDecode(response.body);
+        final responseStatus = response.statusCode;
 
-        // showing snack
-        ScaffoldMessenger.of(context).showSnackBar(successSnackBar);
+        if(responseStatus == 401) { // some error occurred
+          // showing snack
+          ScaffoldMessenger.of(context).showSnackBar(errorSnackBar);
+        }
+
+        if(responseStatus == 200) { // signup successful
+          // showing snack
+          ScaffoldMessenger.of(context).showSnackBar(successSnackBar);
+
+          // navigate to login screen after 3 seconds
+          await Future.delayed(const Duration(seconds: 3));
+          Navigator.pushNamed(context, loginScreenRoute);
+        }
 
         // hiding loading
-        setState(() => {
-          submitBtnLoading = false
-        });
-
-        // navigate to login screen after 3 seconds
-        await Future.delayed(const Duration(seconds: 3));
-        Navigator.pushNamed(context, loginScreenRoute);
-        // Navigator.pushNamedAndRemoveUntil(context, loginScreenRoute, (r) => false);
+        setState(() => submitBtnLoading = false);
       } catch (err) {
         print('Error Occurred: $err');
 

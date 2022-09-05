@@ -40,6 +40,11 @@ class _MessagesContentState extends State<MessagesContent> {
     fontSize: 15,
   );
 
+  @override
+  void initState() {
+    print('page navigated messages');
+  }
+
   // data
   List<MessagesDataItem> messages = [
     MessagesDataItem(

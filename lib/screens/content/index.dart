@@ -92,6 +92,7 @@ class _ContentMainScreenState extends State<ContentMainScreen> {
           index: currentIndex,
           children: screens,
         ),
+
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
