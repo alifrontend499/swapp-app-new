@@ -44,6 +44,8 @@ dependencies:
   unicons: ^2.1.0
   http: ^0.13.5
   shared_preferences: ^2.0.15
+  api_cache_manager: ^1.0.2
+  shimmer: ^2.0.0
 
 
 

@@ -9,3 +9,8 @@ const String COMMON_EXIT_APP_ON_DOUBLE_TAP = 'Press back again to exit';
 // error messages
 const String ERROR_MSG_ENTER_EMAIL = 'Please enter a valid email address';
 const String ERROR_MSG_ENTER_VALUE = 'Please enter a valid value';
+
+// api cache manager consts
+const String GET_FAVS_KEY = "GET_FAVS_KEY";
+const String GET_SPOTS_KEY = "GET_SPOTS_KEY";
+const String GET_MSGS_KEY = "GET_MSGS_KEY";

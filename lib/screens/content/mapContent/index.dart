@@ -35,8 +35,6 @@ class _MapContentState extends State<MapContent> {
 
   @override
   void initState() {
-    print('page navigated map');
-
     // loading map styles
     DefaultAssetBundle.of(context).loadString('assets/mapStyles/default_style.json').then((value) => defaultMapStyle = value);
 

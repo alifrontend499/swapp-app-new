@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+// common consts
+import 'package:app/theme/commonConst/textConsts.dart';
+
 // routes
 import 'package:app/theme/routing/routing_constants.dart';
 
@@ -17,6 +20,13 @@ import 'package:app/theme/colors.dart';
 
 // toast
 import 'package:fluttertoast/fluttertoast.dart';
+
+// http
+import 'package:http/http.dart' as http;
+
+// api cachec manager
+import 'package:api_cache_manager/api_cache_manager.dart';
+import 'package:api_cache_manager/models/cache_db_model.dart';
 
 class MessagesContent extends StatefulWidget {
   const MessagesContent({Key? key}) : super(key: key);
@@ -42,7 +52,27 @@ class _MessagesContentState extends State<MessagesContent> {
 
   @override
   void initState() {
-    print('page navigated messages');
+    getMessagesData();
+  }
+
+  Future getMessagesData() async {
+    var isCacheDataExists = await APICacheManager().isAPICacheKeyExist(GET_SPOTS_KEY);
+
+    if(!isCacheDataExists) {
+      // -- getting data from the api if cache doesn't exist
+      final response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/posts'));
+
+      // -- adding data to cache
+      APICacheDBModel cacheDBModal = APICacheDBModel(
+          key: GET_SPOTS_KEY,
+          syncData: response.body
+      );
+      await APICacheManager().addCacheData(cacheDBModal);
+
+    } else {
+      // -- getting data from cached
+      var cachedData = await APICacheManager().getCacheData(GET_SPOTS_KEY);
+    }
   }
 
   // data
