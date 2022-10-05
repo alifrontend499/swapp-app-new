@@ -2,6 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+// routing consts
+import 'package:app/theme/routing/routing_constants.dart';
+
 // icons
 import 'package:unicons/unicons.dart';
 
@@ -16,6 +19,10 @@ import 'package:app/screens/userProfile/const/textConsts.dart';
 
 // image picker
 import 'package:image_picker/image_picker.dart';
+
+// screens
+import 'package:app/screens/userProfile/screens/editProfile.dart';
+
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({Key? key}) : super(key: key);
@@ -203,25 +210,25 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
                   // child | user name
                   Text(
-                      'Chris MitchellChris',
-                      style: userNameStyles,
-                      textAlign: TextAlign.center
+                    'Chris MitchellChris',
+                    style: userNameStyles,
+                    textAlign: TextAlign.center
                   ),
                   const SizedBox(height: 3),
 
                   // child | user desg
                   Text(
-                      'Engineer',
-                      style: userDesgStyles,
-                      textAlign: TextAlign.center
+                    'Engineer',
+                    style: userDesgStyles,
+                    textAlign: TextAlign.center
                   ),
                   const SizedBox(height: 5),
 
                   // child | button
                   ElevatedButton(
-                      onPressed: () => {},
-                      child: const Text(BTN_EDIT_PROFILE),
-                      style: viewProfileBtnStyles
+                    onPressed: () => Navigator.of(context).push(_createRoute()),
+                    child: const Text(BTN_EDIT_PROFILE),
+                    style: viewProfileBtnStyles
                   ),
                 ],
               ),
@@ -487,3 +494,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   );
 }
 
+Route _createRoute() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => const EditProfileScreen(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(1.0, 0.0);
+      const end = Offset.zero;
+      const curve = Curves.ease;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}

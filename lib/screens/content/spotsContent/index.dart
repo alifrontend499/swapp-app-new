@@ -1,36 +1,84 @@
-import 'package:app/screens/content/spotsContent/content_loading.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
-
-// common consts
-import 'package:app/theme/commonConst/textConsts.dart';
-
-// google fonts
-import 'package:google_fonts/google_fonts.dart';
-
-// colors
-import 'package:app/theme/colors.dart';
-
-// qr code
-import 'package:qr_flutter/qr_flutter.dart';
 
 // toast
 import 'package:fluttertoast/fluttertoast.dart';
 
-// route
-import 'package:app/theme/routing/routing_constants.dart';
-
-// page consts
-import 'package:app/screens/content/const/textConsts.dart';
+// image
+import 'package:qr_flutter/qr_flutter.dart';
 
 // icons
 import 'package:unicons/unicons.dart';
 
+// routing consts
+import 'package:app/theme/routing/routing_constants.dart';
+
+// global colors
+import 'package:app/theme/colors.dart';
+
+// google fonts
+import 'package:google_fonts/google_fonts.dart';
+
+// common consts
+import 'package:app/theme/commonConst/textConsts.dart';
+
+// page consts
+import 'package:app/screens/content/const/textConsts.dart';
+
+// modals
+import 'package:app/screens/content/spotsContent/modals/spot_list_modal.dart';
+
 // http
 import 'package:http/http.dart' as http;
 
-// api cachec manager
-import 'package:api_cache_manager/api_cache_manager.dart';
-import 'package:api_cache_manager/models/cache_db_model.dart';
+// apis urls
+import 'package:app/theme/apis/api_urls.dart';
+
+// shared preferences
+import 'package:shared_preferences/shared_preferences.dart';
+
+// content loading
+import 'package:app/screens/content/favouritesContent/content_loading.dart';
+
+// styles
+final itemHeadingStyles = GoogleFonts.montserrat(
+  fontSize: 16,
+  fontWeight: FontWeight.w600,
+  color: appTextColorPrimary,
+);
+final descTextBoldStyles = GoogleFonts.montserrat(
+  fontSize: 14,
+  fontWeight: FontWeight.w600,
+);
+final descTextStyles = GoogleFonts.montserrat(
+  fontSize: 15,
+);
+final qrCodeStyles = GoogleFonts.montserrat(
+  fontSize: 16,
+  fontWeight: FontWeight.w600,
+);
+final codeStyles = GoogleFonts.montserrat(
+    fontSize: 25,
+    fontWeight: FontWeight.w600,
+    letterSpacing: 7
+);
+final codeBtnStyles = ElevatedButton.styleFrom(
+  elevation: 0,
+  splashFactory: NoSplash.splashFactory,
+  minimumSize: const Size(115, 34),
+  shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10)
+  ),
+  primary: appPrimaryBtnColor,
+  onPrimary: Colors.black87,
+  textStyle: GoogleFonts.montserrat(
+    textStyle: const TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.w600,
+    ),
+  ),
+);
+
 
 class SwappSpotsContent extends StatefulWidget {
   const SwappSpotsContent({Key? key}) : super(key: key);
@@ -40,304 +88,288 @@ class SwappSpotsContent extends StatefulWidget {
 }
 
 class _SwappSpotsContentState extends State<SwappSpotsContent> {
+  final _listViewController = ScrollController();
+  static int apiDataLimit = 10;
+  int apiCurrentPage = 1;
+  late List<SpotListModal> contentData = [];
   bool contentLoading = false;
+  bool hasMoreContentToLoad = true;
+  bool hasApiError = false;
 
-  // styles
-  final itemHeadingStyles = GoogleFonts.montserrat(
-    fontSize: 16,
-    fontWeight: FontWeight.w600,
-    color: appTextColorPrimary,
-  );
-  final descTextBoldStyles = GoogleFonts.montserrat(
-    fontSize: 14,
-    fontWeight: FontWeight.w600,
-  );
-  final descTextStyles = GoogleFonts.montserrat(
-    fontSize: 15,
-  );
-  final qrCodeStyles = GoogleFonts.montserrat(
-    fontSize: 16,
-    fontWeight: FontWeight.w600,
-  );
-  final codeStyles = GoogleFonts.montserrat(
-      fontSize: 25,
-      fontWeight: FontWeight.w600,
-      letterSpacing: 7
-  );
-  final codeBtnStyles = ElevatedButton.styleFrom(
-    elevation: 0,
-    splashFactory: NoSplash.splashFactory,
-    minimumSize: const Size(115, 34),
-    shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10)
-    ),
-    primary: appPrimaryBtnColor,
-    onPrimary: Colors.black87,
-    textStyle: GoogleFonts.montserrat(
-      textStyle: const TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w600,
-      ),
-    ),
-  );
+  @override
+  void initState() {
+    super.initState();
+
+    if(contentData.isEmpty) {
+      fetchContentData();
+    }
+
+    // when page is at the end
+    _listViewController.addListener(() {
+      if(_listViewController.position.maxScrollExtent == _listViewController.offset) {
+        fetchContentData();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    _listViewController.dispose();
+  }
+
+  Future fetchContentData() async {
+    // if loading is in progress then do not execute this function
+    if(contentLoading) return;
+
+    // showing loading only if the user is loading the data for the first time
+    if(apiCurrentPage == 1) {
+      setState(() => contentLoading = true);
+    }
+
+    // getting user token
+    final sharedPrefs = await SharedPreferences.getInstance();
+    final String userToken = sharedPrefs.getString(SHARED_PREF_KEY_USER_TOKEN) ?? "";
+
+    final response = await http.get(
+        Uri.parse('$favListApi?_limit=$apiDataLimit&page=$apiCurrentPage'),
+        headers: {
+          'Authorization': userToken
+        }
+    );
+    final statusCode = response.statusCode;
+    final responseBody = response.body;
+    final responseBodyJson = jsonDecode(responseBody);
+
+
+    if(statusCode == 200) {
+      // hiding loading
+      setState(() => contentLoading = false);
+
+      List<SpotListModal> dataList = [];
+      for(var singleItem in responseBodyJson['items']['favourites']) {
+        SpotListModal dataItem = SpotListModal(
+            vendorId: singleItem['vendorId'],
+            vendorName: singleItem['vendorName'],
+            vendorOpeningTimeFrom: singleItem['vendorOpeningTimeFrom'],
+            vendorOpeningTimeTo: singleItem['vendorOpeningTimeTo'],
+            vendorOffer: singleItem['vendorOffer'],
+            vendorOfferType: singleItem['vendorOfferType'],
+            vendorOfferCode: singleItem['vendorOfferCode']
+        );
+        dataList.add(dataItem);
+      }
+
+      setState(() {
+        // no api error
+        hasApiError = false;
+
+        // increment the page
+        apiCurrentPage++;
+
+        // setting content
+        contentData.addAll(dataList);
+
+        // checking if there's more data to load
+        if(dataList.length < apiDataLimit) {
+          hasMoreContentToLoad = false;
+        }
+      });
+    } else {
+      // hiding loading
+      setState(() {
+        hasApiError = true;
+        contentLoading = false;
+        hasMoreContentToLoad = false;
+      });
+
+      throw Exception(FAILED_TO_LOAD_FROM_API);
+    }
+
+  }
+
+  Future refreshContent() async {
+    setState(() {
+      apiCurrentPage = 1;
+      contentLoading = false;
+      contentData.clear();
+    });
+
+    fetchContentData();
+  }
 
   void showToast(msg) => Fluttertoast.showToast(
     msg: msg,
     fontSize: 15
   );
 
-  @override
-  void initState() {
-    getSpotsData();
-  }
-
-  Future getSpotsData() async {
-    var isCacheDataExists = await APICacheManager().isAPICacheKeyExist(GET_SPOTS_KEY);
-
-    // showing loading
-    setState(() => contentLoading = true );
-
-    if(!isCacheDataExists) {
-      // -- getting data from the api if cache doesn't exist
-      final response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/posts'));
-
-      // -- adding data to cache
-      APICacheDBModel cacheDBModal = APICacheDBModel(
-          key: GET_SPOTS_KEY,
-          syncData: response.body
-      );
-      await APICacheManager().addCacheData(cacheDBModal);
-
-      // hinding loading
-      setState(() => contentLoading = false );
-
-    } else {
-      // -- getting data from cached
-      var cachedData = await APICacheManager().getCacheData(GET_SPOTS_KEY);
-
-      // hinding loading
-      setState(() => contentLoading = false );
-    }
-  }
-
-  // data
-  List<Map<String, dynamic>> swappSpots = [
-    {
-      'title': 'The White Hart - 0.1 mile',
-      'timeFrom': '10am',
-      'timeTo': '5pm',
-      'offer': 'Bottomless coffee when ordering lunch',
-      'offerType': 'qr',
-      'offerCode': 'testqrcode',
-      'isFav': false,
-    },
-    {
-      'title': 'The new lagoon - 0.2 mile',
-      'timeFrom': '9am',
-      'timeTo': '4pm',
-      'offer': 'Free food one time',
-      'offerType': 'code',
-      'offerCode': 'GETITNOW',
-      'isFav': false,
-    },
-    {
-      'title': 'The White Hart - 0.1 mile',
-      'timeFrom': '10am',
-      'timeTo': '5pm',
-      'offer': 'Bottomless coffee when ordering lunch',
-      'offerType': 'qr',
-      'offerCode': 'testqrcode',
-      'isFav': false,
-    },
-    {
-      'title': 'The White Hart - 0.1 mile',
-      'timeFrom': '10am',
-      'timeTo': '5pm',
-      'offer': 'Bottomless coffee when ordering lunch',
-      'offerType': 'qr',
-      'offerCode': 'testqrcode',
-      'isFav': false,
-    },
-    {
-      'title': 'The new lagoon - 0.2 mile',
-      'timeFrom': '9am',
-      'timeTo': '4pm',
-      'offer': 'Free food one time',
-      'offerType': 'code',
-      'offerCode': 'GETITNOW',
-      'isFav': false,
-    },
-    {
-      'title': 'The White Hart - 0.1 mile',
-      'timeFrom': '10am',
-      'timeTo': '5pm',
-      'offer': 'Bottomless coffee when ordering lunch',
-      'offerType': 'qr',
-      'offerCode': 'testqrcode',
-      'isFav': false,
-    },
-  ];
-
-  // functions
-  Future<void> onRefresh() async {
-    // showing loading
-    setState(() => contentLoading = true );
-
-    await Future.delayed(const Duration(seconds: 1), () {
-        showToast('List Updated');
-    });
-
-    // hinding loading
-    setState(() => contentLoading = false );
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(SWAPP_PAGE_TITLE),
-        titleTextStyle: GoogleFonts.montserrat(
-            fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black),
-        centerTitle: true,
-        leading: null,
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
-        elevation: 2,
-        shadowColor: Colors.black26,
-      ),
-      body: RefreshIndicator(
-        onRefresh: () => onRefresh(),
-        child: ListView.builder(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          itemCount: contentLoading ? 5 : swappSpots.length,
-          itemBuilder: (context, index) {
-            if(contentLoading) { // if loading is enabled
-              return const SpotsContentLoading();
-            } else {
-              final item = swappSpots[index];
-              return InkWell( // item start
-                splashColor: Colors.transparent,
-                highlightColor: appGreyHighlightBGColor,
-                onTap: () => Navigator.pushNamed(context, vendorViewScreenRoute),
-                child: Container(
-                  padding: const EdgeInsets.only(top: 7, left: 15, right: 15),
-                  child: Container(
-                    padding: const EdgeInsets.only(bottom: 5),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
+        appBar: AppBar(
+          title: const Text(SWAPP_PAGE_TITLE),
+          titleTextStyle: GoogleFonts.montserrat(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black),
+          centerTitle: true,
+          leading: null,
+          automaticallyImplyLeading: false,
+          backgroundColor: Colors.white,
+          elevation: 2,
+          shadowColor: Colors.black26,
+        ),
+
+        body: RefreshIndicator(
+          onRefresh: refreshContent,
+          child: ListView.separated(
+              controller: _listViewController,
+              physics: const BouncingScrollPhysics(),
+              itemCount: contentLoading ? 5 : contentData.length + 1,
+              separatorBuilder: (context, index) => const Divider(),
+              itemBuilder: (context, index) {
+                if(contentLoading) {
+                  return const FavouritesContentLoading();
+                } else {
+                  if(index < contentData.length) {
+                    final item = contentData[index];
+                    return InkWell( // item start
+                      splashColor: Colors.transparent,
+                      highlightColor: appGreyHighlightBGColor,
+                      onTap: () => Navigator.pushNamed(context, vendorViewScreenRoute),
+                      child: Container(
+                        padding: const EdgeInsets.only(top: 7, left: 15, right: 15),
+                        child: Container(
+                          padding: const EdgeInsets.only(bottom: 5),
+                          child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                item['title'],
-                                style: itemHeadingStyles,
-                              ),
-                              const SizedBox(height: 7),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Hours: ',
-                                    style: descTextBoldStyles,
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      item['timeFrom'] + ' - ' + item['timeTo'],
-                                      style: descTextStyles,
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item.vendorName,
+                                      style: itemHeadingStyles,
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Offer: ',
-                                    style: descTextBoldStyles,
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      item['offer'],
-                                      style: descTextStyles,
+                                    const SizedBox(height: 7),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Hours: ',
+                                          style: descTextBoldStyles,
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            item.vendorOpeningTimeFrom + ' - ' + item.vendorOpeningTimeTo,
+                                            style: descTextStyles,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 7),
-                              if (item['offerType'] == 'qr') ...[
-                                ElevatedButton.icon(
-                                    onPressed: () => showModalBottomSheet(
-                                      // enableDrag: false,
-                                      // isDismissible: false,
-                                      isScrollControlled: true,
-                                      backgroundColor: Colors.transparent,
-                                      context: context,
-                                      builder: (context) => qrCodeBottomSheet(item['offerCode']),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Offer: ',
+                                          style: descTextBoldStyles,
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            item.vendorOffer,
+                                            style: descTextStyles,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    icon: const Icon(
-                                      UniconsLine.qrcode_scan,
-                                      size: 17,
-                                    ),
-                                    label: const Text(SWAPP_PAGE_BTN_QR_CODE),
-                                    style: codeBtnStyles
+                                    const SizedBox(height: 7),
+                                    if (item.vendorOfferType == 'qr') ...[
+                                      ElevatedButton.icon(
+                                          onPressed: () => showModalBottomSheet(
+                                            // enableDrag: false,
+                                            // isDismissible: false,
+                                            isScrollControlled: true,
+                                            backgroundColor: Colors.transparent,
+                                            context: context,
+                                            builder: (context) => qrCodeBottomSheet(item.vendorOfferCode),
+                                          ),
+                                          icon: const Icon(
+                                            UniconsLine.qrcode_scan,
+                                            size: 17,
+                                          ),
+                                          label: const Text(SWAPP_PAGE_BTN_QR_CODE),
+                                          style: codeBtnStyles
+                                      ),
+                                    ] else ...[
+                                      ElevatedButton.icon(
+                                          onPressed: () => showModalBottomSheet(
+                                            // enableDrag: false,
+                                            // isDismissible: false,
+                                            isScrollControlled: true,
+                                            backgroundColor: Colors.transparent,
+                                            context: context,
+                                            builder: (context) => codeBottomSheet(item.vendorOfferCode),
+                                          ),
+                                          icon: const Icon(
+                                            UniconsLine.ticket,
+                                            size: 17,
+                                          ),
+                                          label: const Text(SWAPP_PAGE_BTN_CODE),
+                                          style: codeBtnStyles
+                                      ),
+                                    ],
+                                  ],
                                 ),
-                              ] else ...[
-                                ElevatedButton.icon(
-                                    onPressed: () => showModalBottomSheet(
-                                      // enableDrag: false,
-                                      // isDismissible: false,
-                                      isScrollControlled: true,
-                                      backgroundColor: Colors.transparent,
-                                      context: context,
-                                      builder: (context) => codeBottomSheet(item['offerCode']),
-                                    ),
-                                    icon: const Icon(
-                                      UniconsLine.ticket,
-                                      size: 17,
-                                    ),
-                                    label: const Text(SWAPP_PAGE_BTN_CODE),
-                                    style: codeBtnStyles
+                              ),
+
+                              Padding(
+                                padding: const EdgeInsets.only(left: 10),
+                                child: IconButton(
+                                  splashColor: Colors.transparent,
+                                  onPressed: () {},
+                                  icon: const Icon(
+                                    UniconsSolid.bookmark,
+                                    size: 30,
+                                    color: appPrimaryColor,
+                                  ),
                                 ),
-                              ],
+                              ),
                             ],
                           ),
                         ),
-
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: IconButton(
-                            splashColor: Colors.transparent,
-                            onPressed: () {
-                              showToast(
-                                  (item['isFav'] == true) ? SWAPP_PAGE_NOTI_REMOVED_TO_FAV : SWAPP_PAGE_NOTI_ADDED_TO_FAV
-                              );
-
-                              setState(() {
-                                item['isFav'] = !item['isFav'];
-                              });
-                            },
-                            icon: Icon(
-                              (item['isFav'] == true) ? UniconsSolid.bookmark : UniconsLine.bookmark,
-                              size: 30,
-                              color: appPrimaryColor,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }
-          },
-        ),
-      )
+                      ),
+                    );
+                  } else {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      child: Column(
+                        children: [
+                          if(hasApiError) ...[ // if there's some api error
+                            const Text('some error occured')
+                          ] else ...[
+                            if(hasMoreContentToLoad) ...[
+                              const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            ] else ...[
+                              const Text('End of List')
+                            ],
+                          ],
+                        ],
+                      ),
+                    );
+                  }
+                }
+              }
+          ),
+        )
     );
   }
 
@@ -436,4 +468,5 @@ class _SwappSpotsContentState extends State<SwappSpotsContent> {
       ),
     ),
   );
+
 }

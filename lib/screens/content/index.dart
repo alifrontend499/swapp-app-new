@@ -37,6 +37,26 @@ import 'package:app/screens/content/components/leftDrawerContent.dart';
 // app logout
 import 'package:app/theme/utils/appLogout.dart';
 
+// styles
+final userNameStyles = GoogleFonts.montserrat(
+    fontSize: 16,
+    fontWeight: FontWeight.w600
+);
+final userDesgStyles = GoogleFonts.montserrat(
+  fontSize: 15,
+);
+final drawerMenuItemStyle = GoogleFonts.montserrat(
+  fontSize: 14.5,
+);
+final onlineStatusItemStyle = GoogleFonts.montserrat(
+    fontSize: 12,
+    fontWeight: FontWeight.w600
+);
+final labelStyle = GoogleFonts.montserrat(
+    // fontWeight: FontWeight.w600,
+    fontSize: 12
+);
+
 class ContentMainScreen extends StatefulWidget {
   const ContentMainScreen({Key? key}) : super(key: key);
 
@@ -45,22 +65,15 @@ class ContentMainScreen extends StatefulWidget {
 }
 
 class _ContentMainScreenState extends State<ContentMainScreen> {
-  // styles
-  final labelStyle = GoogleFonts.montserrat(
-    fontWeight: FontWeight.w600,
-    fontSize: 12
-  );
-
   int currentIndex = 0;
-
   final screens= [
     const MapContent(),
     const SwappSpotsContent(),
     const FavouritesContent(),
     const MessagesContent(),
   ];
-
   DateTime timeBackPressed = DateTime.now();
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -88,17 +101,18 @@ class _ContentMainScreenState extends State<ContentMainScreen> {
           child: drawerContent(),
         ),
 
-        body: IndexedStack(
-          index: currentIndex,
-          children: screens,
-        ),
+        // body: IndexedStack(
+        //   index: currentIndex,
+        //   children: screens,
+        // ),
+        body: screens[currentIndex],
 
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
           onTap: (index) => setState(() => currentIndex = index),
-          unselectedItemColor: Colors.black87,
-          selectedItemColor: appPrimaryColor,
+          unselectedItemColor: Colors.black45,
+          selectedItemColor: Colors.black,
           selectedLabelStyle: labelStyle,
           unselectedLabelStyle: labelStyle,
           items: const [
@@ -108,7 +122,7 @@ class _ContentMainScreenState extends State<ContentMainScreen> {
                 padding: EdgeInsets.only(bottom: 5, top: 3),
                 child: Icon(
                   UniconsLine.map,
-                  size: 22,
+                  size: 20,
                 ),
               ),
             ),
@@ -119,7 +133,7 @@ class _ContentMainScreenState extends State<ContentMainScreen> {
                 padding: EdgeInsets.only(bottom: 5, top: 3),
                 child: Icon(
                   UniconsLine.map_marker,
-                  size: 25,
+                  size: 20,
                 ),
               ),
             ),
@@ -130,7 +144,7 @@ class _ContentMainScreenState extends State<ContentMainScreen> {
                 padding: EdgeInsets.only(bottom: 5, top: 3),
                 child: Icon(
                   UniconsLine.bookmark,
-                  size: 24,
+                  size: 20,
                 ),
               ),
             ),
@@ -141,7 +155,7 @@ class _ContentMainScreenState extends State<ContentMainScreen> {
                 padding: EdgeInsets.only(bottom: 5, top: 3),
                 child: Icon(
                   UniconsLine.comment_alt,
-                  size: 22,
+                  size: 20,
                 ),
               ),
             ),
@@ -152,21 +166,6 @@ class _ContentMainScreenState extends State<ContentMainScreen> {
 
   }
 
-  // styles
-  final userNameStyles = GoogleFonts.montserrat(
-    fontSize: 16,
-    fontWeight: FontWeight.w600
-  );
-  final userDesgStyles = GoogleFonts.montserrat(
-    fontSize: 15,
-  );
-  final drawerMenuItemStyle = GoogleFonts.montserrat(
-    fontSize: 14.5,
-  );
-  final onlineStatusItemStyle = GoogleFonts.montserrat(
-    fontSize: 12,
-    fontWeight: FontWeight.w600
-  );
   String userStatus = STATUS_OFFLINE;
   // change user online status
   void onUserStatusChanged() => {

@@ -28,6 +28,9 @@ import 'package:http/http.dart' as http;
 import 'package:api_cache_manager/api_cache_manager.dart';
 import 'package:api_cache_manager/models/cache_db_model.dart';
 
+// content loading
+import 'package:app/screens/content/messagesContent/content_loading.dart';
+
 class MessagesContent extends StatefulWidget {
   const MessagesContent({Key? key}) : super(key: key);
 
@@ -36,6 +39,8 @@ class MessagesContent extends StatefulWidget {
 }
 
 class _MessagesContentState extends State<MessagesContent> {
+  bool contentLoading = false;
+
   // styles
   final userHeadingStyles = GoogleFonts.montserrat(
       fontSize: 16,
@@ -55,8 +60,16 @@ class _MessagesContentState extends State<MessagesContent> {
     getMessagesData();
   }
 
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  // }
+
   Future getMessagesData() async {
     var isCacheDataExists = await APICacheManager().isAPICacheKeyExist(GET_SPOTS_KEY);
+
+    // showing loading
+    setState(() => contentLoading = true );
 
     if(!isCacheDataExists) {
       // -- getting data from the api if cache doesn't exist
@@ -69,9 +82,15 @@ class _MessagesContentState extends State<MessagesContent> {
       );
       await APICacheManager().addCacheData(cacheDBModal);
 
+      // hinding loading
+      setState(() => contentLoading = false );
+
     } else {
       // -- getting data from cached
       var cachedData = await APICacheManager().getCacheData(GET_SPOTS_KEY);
+
+      // hinding loading
+      setState(() => contentLoading = false );
     }
   }
 
@@ -157,12 +176,17 @@ class _MessagesContentState extends State<MessagesContent> {
       fontSize: 15
   );
 
-  Future<void> onRefresh() {
-    return Future.delayed(
-      const Duration(seconds: 1), () {
+  // functions
+  Future<void> onRefresh() async {
+    // showing loading
+    setState(() => contentLoading = true );
+
+    await Future.delayed(const Duration(seconds: 1), () {
       showToast('List Updated');
-    },
-    );
+    });
+
+    // hinding loading
+    setState(() => contentLoading = false );
   }
 
   @override
@@ -186,79 +210,84 @@ class _MessagesContentState extends State<MessagesContent> {
       body: RefreshIndicator(
         onRefresh: () => onRefresh(),
         child: ListView.builder(
+          reverse: true,
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.symmetric(vertical: 5),
-          itemCount: messages.length,
+          itemCount: contentLoading ? 10 : messages.length,
           itemBuilder: (context, index) {
-            final item = messages[index];
-            return InkWell( // item start
-              onTap: () => Navigator.pushNamed(context, messagesViewScreenRoute),
-              splashColor: Colors.transparent,
-              highlightColor: appGreyHighlightBGColor,
-              child: Container(
-                padding: const EdgeInsets.only(top: 12, left: 15, right: 15),
+            if(contentLoading) { // if loading is enabled
+              return const MessagesContentLoading();
+            } else {
+              final item = messages[index];
+              return InkWell( // item start
+                onTap: () => Navigator.pushNamed(context, messagesViewScreenRoute),
+                splashColor: Colors.transparent,
+                highlightColor: appGreyHighlightBGColor,
                 child: Container(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    decoration: const BoxDecoration(
-                      // border: Border(
-                      //   bottom: BorderSide(
-                      //       width: 1,
-                      //       color: Colors.black38
-                      //   ),
-                      // ),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          child: Image.network(
-                            item.imgUrl,
-                            height: 45,
-                            width: 45,
-                            fit: BoxFit.cover,
+                  padding: const EdgeInsets.only(top: 12, left: 15, right: 15),
+                  child: Container(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      decoration: const BoxDecoration(
+                        // border: Border(
+                        //   bottom: BorderSide(
+                        //       width: 1,
+                        //       color: Colors.black38
+                        //   ),
+                        // ),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            child: Image.network(
+                              item.imgUrl,
+                              height: 45,
+                              width: 45,
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.circular(65.0),
                           ),
-                          borderRadius: BorderRadius.circular(65.0),
-                        ),
 
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 15),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        item.userName,
-                                        style: userHeadingStyles,
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 15),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          item.userName,
+                                          style: userHeadingStyles,
+                                        ),
                                       ),
-                                    ),
 
-                                    Text(
-                                      item.time,
-                                      style: messageTimeStyles,
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 5),
+                                      Text(
+                                        item.time,
+                                        style: messageTimeStyles,
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 5),
 
-                                Text(
-                                  item.smallMessage,
-                                  style: userShortMessageStyles,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
+                                  Text(
+                                    item.smallMessage,
+                                    style: userShortMessageStyles,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    )
+                        ],
+                      )
+                  ),
                 ),
-              ),
-            );
+              );
+            }
           },
         ),
       )

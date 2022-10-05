@@ -166,7 +166,7 @@ class LeftDrawerContent extends StatelessWidget {
                     LEFT_MENU_ITEM_SETTINGS,
                     style: drawerMenuItemStyle,
                   ),
-                  onTap: () {},
+                  onTap: () => Navigator.pushNamed(context, settingsScreenRoute),
                 ),
 
                 ListTile(

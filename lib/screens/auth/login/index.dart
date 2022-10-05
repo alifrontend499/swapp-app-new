@@ -142,9 +142,8 @@ class _LoginScreenState extends State<LoginScreen> {
             'password': field_userPassword
           })
         );
-
-        final responseData = jsonDecode(response.body);
         final responseStatus = response.statusCode;
+
 
         if(responseStatus == 401) { // unauthorized access
           // showing snack
@@ -152,6 +151,10 @@ class _LoginScreenState extends State<LoginScreen> {
         }
 
         if(responseStatus == 200) { // user found
+          final responseData = jsonDecode(response.body);
+
+          print('responseData $responseData');
+
           // showing snack
           ScaffoldMessenger.of(context).showSnackBar(successSnackBar);
 
@@ -159,6 +162,8 @@ class _LoginScreenState extends State<LoginScreen> {
           sharedPrefs.remove(SHARED_PREF_KEY_IS_USER_LOGGED_IN);
           // setting value in shared preferences
           sharedPrefs.setBool(SHARED_PREF_KEY_IS_USER_LOGGED_IN, true);
+          // setting user token in shared preferences
+          sharedPrefs.setString(SHARED_PREF_KEY_USER_TOKEN, "Bearer ${responseData['token']}");
 
           // navigate to main screen and removing all the previous history
           await Future.delayed(const Duration(seconds: 2));

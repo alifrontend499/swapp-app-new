@@ -52,18 +52,27 @@ class _MessagesViewScreenState extends State<MessagesViewScreen> {
     fontSize: 15,
   );
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-
-    // _listViewScrollDown();
+  final ScrollController _listViewController = ScrollController();
+  void scrollToBottom() {
+    final bottomOffset = _listViewController.position.maxScrollExtent;
+    _listViewController.animateTo(
+      bottomOffset,
+      duration: const Duration(milliseconds: 1000),
+      curve: Curves.easeInOut,
+    );
   }
 
-  final ScrollController _listViewController = ScrollController();
-  void _listViewScrollDown() {
-    final double end = _listViewController.position.maxScrollExtent;
-    _listViewController.jumpTo(end);
+  @override
+  void initState() {
+    super.initState();
+    
+    // scrollToBottom();
+  }
+
+  @override
+  void dispose() {
+    _listViewController.dispose();
+    super.dispose();
   }
 
   @override

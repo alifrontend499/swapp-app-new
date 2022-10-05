@@ -10,4 +10,5 @@ void appLogout() async {
   // shared preferences
   final sharedPrefs = await SharedPreferences.getInstance();
   await sharedPrefs.remove(SHARED_PREF_KEY_IS_USER_LOGGED_IN);
+  await sharedPrefs.remove(SHARED_PREF_KEY_USER_TOKEN);
 }

@@ -8,5 +8,8 @@ const String signupStep2ScreenRoute = 'signup_screen_step2';
 const String contentMainScreenRoute = 'content_main_screen';
 const String messagesViewScreenRoute = 'messages_view_screen';
 const String userProfileScreenRoute = 'user_profile_screen';
+const String editProfileScreenRoute = 'edit_profile_screen';
+
+const String settingsScreenRoute = 'settings_screen';
 
 const String vendorViewScreenRoute = 'vendor_view_screen';
