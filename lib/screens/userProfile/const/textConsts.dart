@@ -15,3 +15,7 @@ const String YOUR_JOB_TITLE = 'Job Tile';
 const String ENTER_JOB_TITLE = 'Enter your job title';
 const String YOUR_INDUSTRY = 'Industry';
 const String ENTER_INDUSTRY = 'Enter your industry';
+const String YOUR_CARD_NUMBER = 'Card Number';
+const String ENTER_CARD_NUMBER = 'Enter card number';
+const String YOUR_CARD_EXPIRY = 'Expiry Date';
+const String ENTER_CARD_EXPIRY = 'Enter expiry date';
